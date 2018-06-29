@@ -2,7 +2,7 @@
 
 ### [Read my post for preamble of what is going on](https://blog.wellosoft.net/en/nottorus-after-2-years.html)
 
-Nottorus is a powerful plugin, one of its kind. Sadly the plugin author has walked away, and we're afraid of losing this masterpiece.
+Nottorus is a powerful plugin, first of its kind. Sadly the plugin author has walked away, and we're afraid of losing this masterpiece.
 
 ## About This Repo
 
@@ -36,7 +36,7 @@ Mac/Linux (`UpdatePatch.sh`)
 cd .Patches
 git pull origin master
 cd ..
-cp -r .Editor Editor
+cp -R .Editor/ Editor/
 cd Editor
 patch -p1 < ../.Patches/patch.diff
 exit
@@ -62,12 +62,12 @@ The [original Nottorus](http://u3d.as/qVo) still alive in Asset Store, so I can'
 
 ## Contributing
 
-You can submit Issues here. I'll figure the solution as helpful as I can.
+You can submit Issues here (Yep, including editor features). I'll figure the solution as helpful as I can.
 
 If you want to contribute, here's a way to create the patch:
 
 ```sh
-diff -x '*.meta' -crB .Editor Editor > .Patches/patch.diff
+diff -x '*.meta' -uB .Editor Editor > .Patches/patch.diff
 ```
 
 <!--
