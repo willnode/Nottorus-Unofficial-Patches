@@ -735,6 +735,12 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/Addons/CSP/Parser.cs Editor/Ad
  
              Advance(); // over lbracket
  
+diff -x '*.meta' -urB --strip-trailing-cr .Editor/Addons/CSP/Parser_h.cs Editor/Addons/CSP/Parser_h.cs
+--- .Editor/Addons/CSP/Parser_h.cs	2017-04-19 07:45:41.839148500 +0700
++++ Editor/Addons/CSP/Parser_h.cs	2018-06-29 15:26:26.570281500 +0700
+@@ -1 +0,0 @@
+-namespace Addon_CSP{public sealed partial class Parser{private static string precedece = "5cb522ea8daed6787fa7d5ffac551e84";}}
+\ No newline at end of file
 Only in Editor: .Editor
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_DrawNodeCurve.cs Editor/f_DrawNodeCurve.cs
 --- .Editor/f_DrawNodeCurve.cs	2017-03-29 21:33:23.328648400 +0700
@@ -1361,7 +1367,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_OnEnable.cs Editor/f_OnEnabl
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_OnGUI.cs Editor/f_OnGUI.cs
 --- .Editor/f_OnGUI.cs	2017-05-28 22:34:22.083655300 +0700
-+++ Editor/f_OnGUI.cs	2018-06-28 15:37:32.929367700 +0700
++++ Editor/f_OnGUI.cs	2018-06-29 18:47:41.714449200 +0700
 @@ -1,12 +1,7 @@
 -﻿using UnityEditor;
 -using System.Collections.Generic;
@@ -1612,7 +1618,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_OnGUI.cs Editor/f_OnGUI.cs
              DebugTM.Draw();
          }
          else
-@@ -251,22 +146,16 @@
+@@ -251,25 +146,20 @@
              OpenWindow.Show();
          }
  
@@ -1635,9 +1641,14 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_OnGUI.cs Editor/f_OnGUI.cs
          OpenWindow.Draw(); // 9
  
 -   
-         NewScriptWIndow.Draw();//13
+-        NewScriptWIndow.Draw();//13
++        NewScriptWindow.Draw();//13
  
          ReferenceWindow.Draw();//99
++
+         FuncSeqWindow.Draw();//100
+ 
+         NodesFitter.Draw();//192
 @@ -273,13 +163,9 @@
          FuncSeqWindow.Draw();//100
  
@@ -2588,7 +2599,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Details.cs Editor/f_W
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_WindowEditGraph.cs
 --- .Editor/f_WindowEditGraph.cs	2017-03-29 23:55:43.011957100 +0700
-+++ Editor/f_WindowEditGraph.cs	2018-06-28 15:37:32.953374600 +0700
++++ Editor/f_WindowEditGraph.cs	2018-06-29 19:30:11.705402300 +0700
 @@ -1,17 +1,13 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -2637,7 +2648,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
                  {
                      bAllowCut = false;
                      bAllowCopy = false;
-@@ -49,37 +45,44 @@
+@@ -49,46 +45,114 @@
              bAllowCut = true;
              bAllowPaste = true;
          }
@@ -2666,7 +2677,11 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
                  CopyNodes.PasteNodes();
              }
 -        }
+-
  
+-        if (curEvent.isKey && curEvent.keyCode == Options.DeleteKey && curEvent.type == EventType.KeyDown && EditGraphRect.Contains(curEvent.mousePosition))
+-        {
+-            DeleteEditGraphSelection();
 +            else if (ev.keyCode == KeyCode.D && bAllowPaste && bAllowCopy)
 +            {
 +                bAllowCopy = false;
@@ -2674,25 +2689,95 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
 +                CopyNodes.CopyNodes(CurDrawable.SelectedNodes, CurDrawable.SelectedCommentary);
 +                CopyNodes.PasteNodes();
 +            }
-+        }
- 
--        if (curEvent.isKey && curEvent.keyCode == Options.DeleteKey && curEvent.type == EventType.KeyDown && EditGraphRect.Contains(curEvent.mousePosition))
-+        if (ev.isKey && ev.keyCode == Options.DeleteKey && ev.type == EventType.KeyDown && EditGraphRect.Contains(ev.mousePosition))
-         {
-             DeleteEditGraphSelection();
          }
--
+ 
 -
 -        if (Global_MouseInEditGraph && _RMB_Down)
-+        
-+        if (Global_MouseInEditGraph && ev.type == EventType.MouseDown)
++        if (ev.type == EventType.KeyDown && !EditorGUIUtility.editingTextField)
          {
 -            if (curEvent.button == 1)
-+            if (ev.button == 1 || ev.button == 2)
++            if (ev.keyCode == KeyCode.Space)
              {
-                 b_DragEditGraph = true;
+-                b_DragEditGraph = true;
++                NewNode_Window.Show(GlobalMousePos, false, false, false);
              }
-@@ -96,7 +94,7 @@
+-        }
+ 
++            if (Options.IsDeleteKey(ev.keyCode) && EditGraphRect.Contains(ev.mousePosition))
++            {
++                DeleteEditGraphSelection();
++            }
++
++            if (ev.alt && ev.shift)
++            {
++                if (ev.keyCode == KeyCode.S)
++                {
++                    SaveScript(true);
++                }
++
++                if (ev.keyCode == KeyCode.C)
++                {
++                    if (!EditorApplication.isCompiling)
++                        StartCompileScript = true;
++                }
++                
++                if (ev.keyCode == KeyCode.Z)
++                {
++                    UndoSystem.DoUndo();
++                }
++
++                if (ev.keyCode == KeyCode.Y)
++                {
++                    UndoSystem.DoRedo();
++                }
++
++                if (ev.keyCode == KeyCode.O)
++                {
++                    OpenWindow.Show();
++                }
+ 
++                if (ev.keyCode == KeyCode.N)
++                {
++                    NewScriptWindow.Show();
++                }
+ 
++                if (ev.keyCode == KeyCode.F)
++                {
++                    FitPlacer.PlaceFit(CurDrawable, false, true);
++                }
+ 
++                if (ev.keyCode == KeyCode.X)
++                {
++                    // Exclude node from sequence and delete
++                    foreach (var node in CurDrawable.SelectedNodes)
++                    {                       
++                        var sourceLink = Linking.SourceConnectorLinkExite(node, 0);
++                        var endLink = Linking.EndConnectorLinkExite(node, 0);
++
++                        if (sourceLink != null && endLink != null)
++                        {
++                            endLink.LNodeID = sourceLink.LNodeID;
++
++                            sourceLink.NodeID = -10;
++                            sourceLink.LNodeID = -10;
++                        }
++                    }
++                    DeleteEditGraphSelection();
++                }
++            }
++        }
+ 
++        if (Global_MouseInEditGraph && ev.type == EventType.MouseDown)
++        {
++            if (ev.button == 1 || ev.button == 2)
++            {
++                b_DragEditGraph = true;
++            }
++        }
+ 
+         if (_LMB_Down)
+         {
+@@ -96,7 +160,7 @@
              {
                  LMB_Down_Deleg = delegate
                  {
@@ -2701,7 +2786,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
                      b_SelectNodes = true;
                      SelectNodesStartPos = GlobalMousePos;
  
-@@ -132,31 +128,30 @@
+@@ -132,31 +194,30 @@
                  }
              }
          }
@@ -2723,9 +2808,9 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
 +            if (ev.type == EventType.ScrollWheel)
 +                offset = ev.delta.y * CurDrawable.Zoom / 50;
 +            else if (ev.keyCode == KeyCode.PageDown)
-+                offset = -0.5f;
++                offset = -0.2f * CurDrawable.Zoom;
 +            else if (ev.keyCode == KeyCode.PageUp)
-+                offset = 0.5f;
++                offset = 0.2f * CurDrawable.Zoom;
 +
 +            if (offset != 0)
 +            {
@@ -2749,7 +2834,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
          m_Zoom.BeginScale(ref tempR, EditGraphRect.size / 2, CurDrawable.Zoom, true);
  
          Draw_BGGrid();
-@@ -168,32 +163,35 @@
+@@ -168,32 +229,35 @@
              if (!Options.b_HideElementsOnZoom || CurDrawable.Zoom < 3)
                  DrawLinksConnections();
  
@@ -2795,7 +2880,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
              tipe.Draw();
          }
          DebugValuesDrawList = new List<ToolTipeData>();
-@@ -202,26 +200,24 @@
+@@ -202,26 +266,24 @@
  
          SelectNodes();
  
@@ -2828,7 +2913,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
  
                      bubbleRect.x += 5;
                      bubbleRect.y += 5;
-@@ -248,25 +236,20 @@
+@@ -248,25 +302,20 @@
              b_SelectNodes = false;
          }
  
@@ -2857,7 +2942,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
          if (b_SelectNodes)
          {
              Vector2 offsetSelection = GlobalMousePos - SelectNodesStartPos;// Global_MousePos;// CurDrawable.GetRealMousePos - SelectNodesStartPos;
-@@ -292,7 +274,7 @@
+@@ -292,7 +340,7 @@
  
                  //if(SelectNodesRect.width > 6 && SelectNodesRect.height > 6)
                  if (offsetSelection.magnitude > 6)
@@ -2866,7 +2951,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
              }
          }
      }
-@@ -308,10 +289,6 @@
+@@ -308,10 +355,6 @@
          width *= scaleTex;
          height *= scaleTex;
  
@@ -2877,7 +2962,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
          int startPosX = Mathf.RoundToInt(-CurDrawable.EditGraphDragOffset.x / width) - 1;
          int startPosY = Mathf.RoundToInt(-CurDrawable.EditGraphDragOffset.y / height) - 1;
  
-@@ -323,17 +299,11 @@
+@@ -323,17 +365,11 @@
          {
              for (float y = startPosY; y < startPosY + countY; y++)
              {
@@ -2896,7 +2981,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
      private bool b_DragEditGraph = false;
  
      private void DrawLinksConnections()
-@@ -341,7 +311,7 @@
+@@ -341,7 +377,7 @@
          List<LinkInfo> drawPinLinks = new List<LinkInfo>();
          drawPinLinks.AddRange(CurDrawable.NodePinsLinks);
  
@@ -2905,7 +2990,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
          {
              if (Linking.DragPinLinks.Contains(link))
                  continue;
-@@ -393,12 +358,12 @@
+@@ -393,12 +424,12 @@
                  {
                      float menuWidth = 50;
  
@@ -2920,7 +3005,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
                      GUI.Box(scitchRect, variants[EndPin.TypesConvertVariant], Res.ButtonSimple);
  
                      if (scitchRect.Contains(Event.current.mousePosition))
-@@ -476,7 +438,7 @@
+@@ -476,7 +504,7 @@
          List<LinkInfo> drawConnLinks = new List<LinkInfo>();
          drawConnLinks.AddRange(CurDrawable.NodeConnectorsLinks);
  
@@ -2929,7 +3014,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
          {
              if (Linking.DragConnectorLinks.Contains(link))
                  continue;
-@@ -524,11 +483,9 @@
+@@ -524,11 +549,9 @@
              DrawNodeCurve(start, end, color, 4, false, link);
          }
  
@@ -2942,7 +3027,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
          {
              foreach (var link in Linking.DragPinLinks)
              {
-@@ -547,8 +504,7 @@
+@@ -547,8 +570,7 @@
  
                  Node_Pin realPin = null;
  
@@ -2952,7 +3037,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
                  {
                      realPin = SourceNode.Config.InPins.Find(x => x.PinID == link.NodeConPinID);
                  }
-@@ -556,7 +512,6 @@
+@@ -556,7 +578,6 @@
                  {
                      realPin = SourceNode.Config.OutPins.Find(x => x.PinID == link.LNodeConPinID);
                  }
@@ -2960,7 +3045,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
  
                  if (realPin == null)
                  {
-@@ -580,7 +534,7 @@
+@@ -580,7 +600,7 @@
                          SourceNode.NodeRect.x + realPin.PosX + 7,
                          SourceNode.NodeRect.y + realPin.PosY + 7
                      );
@@ -2969,7 +3054,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
                      DrawNodeCurve(CurDrawable.GetLinkingNewNodeMousePos + CurDrawable.EditGraphDragOffset, end, GetColorByType(realPin.type.PType), 2, invert, null);
                  }
              }
-@@ -607,7 +559,7 @@
+@@ -607,7 +625,7 @@
                      SourceNode.NodeRect.x + Linking.NodePin.PosX + 7,
                      SourceNode.NodeRect.y + Linking.NodePin.PosY + 7
                  );
@@ -2978,7 +3063,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
                  DrawNodeCurve(CurDrawable.GetLinkingNewNodeMousePos + CurDrawable.EditGraphDragOffset, end, GetColorByType(Linking.NodePin.type.PType), 2, invert, null);
              }
          }
-@@ -643,7 +592,6 @@
+@@ -643,7 +658,6 @@
                      Debug.Log("Can't find pin " + link.NodeConPinID + " in node " + link.NodeID + " for drawing the redirect linking");
                      continue;
                  }
@@ -2986,7 +3071,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
  
                  if (SourceNode != null)
                  {
-@@ -732,9 +675,6 @@
+@@ -732,9 +741,6 @@
              else if (offsetXlabel == 2)
                  posx -= labelPixelsSize / 2;
  
@@ -2996,7 +3081,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
              float offsetOpen = 0;
  
              bool drawOpenClassButton = OwnerPin.DebugValue != null && OwnerPin.DebugValue.GetType().IsClass;
-@@ -745,44 +685,40 @@
+@@ -745,44 +751,40 @@
                  posx -= offsetOpen;
              }
  
@@ -3051,7 +3136,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
              }
  
              dataDrawRect.x += 7;
-@@ -793,4 +729,4 @@
+@@ -793,4 +795,4 @@
              GUI.color = Color.white;
          }
      }
@@ -3060,7 +3145,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_WindowEditGraph.cs Editor/f_
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Toolbar.cs Editor/f_Window_Toolbar.cs
 --- .Editor/f_Window_Toolbar.cs	2017-05-21 05:45:01.856664400 +0700
-+++ Editor/f_Window_Toolbar.cs	2018-06-28 15:37:32.967376100 +0700
++++ Editor/f_Window_Toolbar.cs	2018-06-29 17:00:58.819593200 +0700
 @@ -1,13 +1,8 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -3108,7 +3193,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Toolbar.cs Editor/f_W
              GUI.DrawTexture(vertNestLineRect, Res.ClassNestedLine_Vert);
          }
  
-@@ -109,7 +88,7 @@
+@@ -109,10 +88,10 @@
          if (!DragScriptObj || CurScript.SelectedScriptObjects.Count != 1 || !(CurScript.SelectedScriptObjects[0] is ScriptClass) || CurScript.isSelected(thisClass) || (CurScript.SelectedScriptObjects[0] as ScriptClass) == thisClass)
              return;
  
@@ -3116,8 +3201,21 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Toolbar.cs Editor/f_W
 +        Rect InheritRect = new Rect(NestedOffsetX + ToolbarRect.width / 2, ClassesDrawPosY, ToolbarRect.width / 2, 18);
          GUI.DrawTexture(InheritRect, Res.ClassInheritRect);
  
-         if (InheritRect.Contains(Event.current.mousePosition))
-@@ -168,10 +142,7 @@
+-        if (InheritRect.Contains(Event.current.mousePosition))
++        if (InheritRect.Contains(ev.mousePosition))
+         {
+             DragObjName_Prefix = thisClass.Config.Name + " inherit ";
+ 
+@@ -155,7 +131,7 @@
+ 
+     private void DrawNested(ScriptClass dropToClass)
+     {
+-        if (!DragScriptObj || CurScript.SelectedScriptObjects.Count != 1 || !(CurScript.SelectedScriptObjects[0] is ScriptClass) || CurScript.isSelected(dropToClass) || (Event.current.button != 1))
++        if (!DragScriptObj || CurScript.SelectedScriptObjects.Count != 1 || !(CurScript.SelectedScriptObjects[0] is ScriptClass) || CurScript.isSelected(dropToClass) || (ev.button != 1))
+             return;
+ 
+         ScriptClass dragingClass = CurScript.SelectedScriptObjects[0] as ScriptClass;
+@@ -168,13 +142,10 @@
          if (dragingClass.NestedClasses.Count != 0 && GetRootClass(dropToClass, dragingClass))
              return;
  
@@ -3128,8 +3226,24 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Toolbar.cs Editor/f_W
 +        Rect NestedRect = new Rect(NestedOffsetX, ClassesDrawPosY, ToolbarRect.width / 2, 18);
          GUI.DrawTexture(NestedRect, Res.ClassMoveNestRect);
  
-         if (NestedRect.Contains(Event.current.mousePosition))
-@@ -218,8 +185,8 @@
+-        if (NestedRect.Contains(Event.current.mousePosition))
++        if (NestedRect.Contains(ev.mousePosition))
+         {
+             DragObjName_Postfix = " nested to: " + dropToClass.Config.Name;
+ 
+@@ -207,10 +175,9 @@
+         ClassesDrawPosY += 17;
+     }
+ 
+-
+     private void DrawScriptNested(ScriptClass afterScriptClass)
+     {
+-        if (!DragScriptObj || CurScript.SelectedScriptObjects.Count != 1 || !(CurScript.SelectedScriptObjects[0] is ScriptClass) || (Event.current.button != 1))
++        if (!DragScriptObj || CurScript.SelectedScriptObjects.Count != 1 || !(CurScript.SelectedScriptObjects[0] is ScriptClass) || (ev.button != 1))
+             return;
+ 
+         ScriptClass thatClass = CurScript.SelectedScriptObjects[0] as ScriptClass;
+@@ -218,10 +185,10 @@
          if (thatClass.NestedOwner == -1)
              return;
  
@@ -3138,8 +3252,11 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Toolbar.cs Editor/f_W
 +        Rect NestedRect = new Rect(NestedOffsetX, ClassesDrawPosY, ToolbarRect.width / 2, 18);
 +        DrawTexture(NestedRect, Res.ClassMoveNestRect);
  
-         if (NestedRect.Contains(Event.current.mousePosition))
+-        if (NestedRect.Contains(Event.current.mousePosition))
++        if (NestedRect.Contains(ev.mousePosition))
          {
+             DragObjName_Postfix = " nested to: Script";
+ 
 @@ -266,8 +229,10 @@
  
      private M_Foldout Foldout_Classes = new M_Foldout();
@@ -3152,6 +3269,15 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Toolbar.cs Editor/f_W
      private M_Foldout Foldout_InherVariables = new M_Foldout(false);
      private M_Foldout Foldout_Properties = new M_Foldout();
      private M_Foldout Foldout_InherProperties = new M_Foldout(false);
+@@ -299,7 +264,7 @@
+         {
+             EditorGUIUtility.AddCursorRect(docRect, MouseCursor.Link);
+ 
+-            if (_LMB_Down && docRect.Contains(Event.current.mousePosition))
++            if (_LMB_Down && docRect.Contains(ev.mousePosition))
+             {
+                 LMB_Down_Deleg = delegate
+                 {
 @@ -311,13 +276,12 @@
  
      void WindowToolbar()
@@ -3421,7 +3547,17 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Toolbar.cs Editor/f_W
          //DebugLinks();
          //DebugNodePinInfo();
  
-@@ -811,8 +748,6 @@
+@@ -802,17 +741,13 @@
+ 
+         GUI.EndScrollView();
+ 
+-
+-
+         ScrollObjsLength = FoldDrawPosY;
+ 
+-        if (Event.current.isKey && Event.current.keyCode == Options.DeleteKey && Event.current.type == EventType.KeyDown && CurScript.SelectedScriptObjects.Count > 0 && ToolbarRect.Contains(Event.current.mousePosition))
++        if (Options.IsDeleteKey(ev.keyCode) && ev.type == EventType.KeyDown && CurScript.SelectedScriptObjects.Count > 0 && ToolbarRect.Contains(ev.mousePosition))
+         {
              DeleteSelectedScriptObjs();
          }
  
@@ -3476,6 +3612,15 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/f_Window_Toolbar.cs Editor/f_W
  
          if (opened)
              GUI.DrawTexture(toggleRect, Res.ListButtonOpen);
+@@ -900,7 +828,7 @@
+ 
+         var foldOpen = foldBoxRect;
+         foldOpen.width -= 16;
+-        if (_LMB_Down && foldOpen.Contains(Event.current.mousePosition))
++        if (_LMB_Down && foldOpen.Contains(ev.mousePosition))
+         {
+             opened = !opened;
+         }
 @@ -983,58 +907,58 @@
  
      private void DrawHideOptionsList()
@@ -5707,7 +5852,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_Compilation_Nodes.cs Editor/
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_Compilation_Script.cs Editor/m_Compilation_Script.cs
 --- .Editor/m_Compilation_Script.cs	2018-02-20 14:08:06.264733400 +0700
-+++ Editor/m_Compilation_Script.cs	2018-06-29 08:30:14.116014400 +0700
++++ Editor/m_Compilation_Script.cs	2018-06-29 21:06:21.412375600 +0700
 @@ -1,16 +1,13 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -7389,7 +7534,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ContinuationManager.cs Edito
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_ControlBar.cs
 --- .Editor/m_ControlBar.cs	2017-05-30 19:18:43.023713500 +0700
-+++ Editor/m_ControlBar.cs	2018-06-29 07:50:26.768143600 +0700
++++ Editor/m_ControlBar.cs	2018-06-29 19:32:31.220841700 +0700
 @@ -1,13 +1,12 @@
 -﻿using UnityEditor;
 +﻿using Nottorus_Debug;
@@ -7443,7 +7588,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
          if (File.Exists(oldDataFile))
          {
-@@ -97,16 +90,17 @@
+@@ -97,20 +90,16 @@
      */
  
      private bool StartCompileScript = false;
@@ -7459,13 +7604,17 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
 +        DrawTexture(barRect, Res.ToolBar, 20, 20, 20, 20);
  
          CB_DrawPosX = ControlBarRect.x + 2;
- 
+-
 -        Rect saveButtonRect = CreateRect(CB_DrawPosX, 21 + BR_Offset, 70, 60);
-+        Rect saveButtonRect = new Rect(CB_DrawPosX, 21 + BR_Offset, 70, 60);
- 
-         if (saveButtonRect.Contains(Event.current.mousePosition))
-             GUIToolTipe = "CTRL+S";
-@@ -127,12 +121,12 @@
+-
+-        if (saveButtonRect.Contains(Event.current.mousePosition))
+-            GUIToolTipe = "CTRL+S";
+-
++        
+         if (DrawButton("Save", Res.Button_Save))
+         {
+             LMB_Down_Deleg = delegate
+@@ -127,12 +116,12 @@
              };
          }
          */
@@ -7480,7 +7629,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          {
              compileTex = Res.Button_CompileUndefined;
          }
-@@ -153,9 +147,7 @@
+@@ -153,9 +142,7 @@
              compileTex = Res.Button_Compile;
          }
  
@@ -7491,7 +7640,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          {
              //if (BCompActive)
              {
-@@ -169,12 +161,9 @@
+@@ -169,12 +156,9 @@
              }
          }
  
@@ -7505,7 +7654,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          if (DrawButton("Undo", Res.Button_Undo))
          {
              LMB_Down_Deleg = delegate
-@@ -191,7 +180,7 @@
+@@ -191,7 +175,7 @@
              };
          }
  
@@ -7514,7 +7663,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          CB_DrawPosX += 7;
  
          if (DrawButton("Options", Res.Button_Options))
-@@ -202,10 +191,9 @@
+@@ -202,10 +186,9 @@
              };
          }
  
@@ -7526,7 +7675,12 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          if (DrawButton("Open Script", Res.Button_Open))
          {
              LMB_Down_Deleg = delegate
-@@ -222,7 +210,7 @@
+@@ -218,11 +201,11 @@
+         {
+             LMB_Down_Deleg = delegate
+             {
+-                NewScriptWIndow.Show();
++                NewScriptWindow.Show();
              };
          }
  
@@ -7535,7 +7689,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          CB_DrawPosX += 7;
  
          if (DrawButton("Seq. diag", Res.ButtonSeqDiag))
-@@ -233,16 +221,13 @@
+@@ -233,16 +216,13 @@
              };
          }
  
@@ -7555,7 +7709,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
          if (!CurScript.b_DebugMode)
          {
-@@ -263,9 +248,8 @@
+@@ -263,9 +243,8 @@
                      CurScript.b_DebugMode = false;
                  };
              }
@@ -7566,7 +7720,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
              EditorGUIUtility.AddCursorRect(drawDebugRect, MouseCursor.Link);
  
-@@ -309,60 +292,46 @@
+@@ -309,60 +287,46 @@
              {
                  SearchDebugObjects();
              }
@@ -7642,7 +7796,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
                  EditorGUIUtility.AddCursorRect(drawInvokeMethodRect, MouseCursor.Link);
  
-@@ -374,9 +343,7 @@
+@@ -374,9 +338,7 @@
  
                  int newSelInvokeMIndex = EditorGUI.Popup(drawInvokeMethodRect, CurClass.SelectedInvokeMethodIndex, CurClass.InvokeMethidsDisplayNameList.ToArray(), Res.PopupButton);
  
@@ -7653,7 +7807,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
                  if (CurClass.SelectedInvokeMethodIndex != newSelInvokeMIndex)
                  {
-@@ -390,7 +357,7 @@
+@@ -390,7 +352,7 @@
                  {
                      string invokeMethodName = CurClass.CurMethodInfokeInfo.MethodName;
  
@@ -7662,7 +7816,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
                      {
                          CurClass.InvokeResult = "";
                          object result = CurClass.CurMethodInfokeInfo.mInfo.Invoke(CurScript.SelectedDebugObject.script, CurClass.CurMethodInfokeInfo.GetArgsVars());
-@@ -398,14 +365,13 @@
+@@ -398,14 +360,13 @@
                      }
  
                      if (CurClass.InvokeResult != "")
@@ -7678,7 +7832,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
                      }
  
                      CB_DrawPosX += Mathf.Max(175, drawOffsetX);
-@@ -419,7 +385,6 @@
+@@ -419,7 +380,6 @@
              {
                  ParseFile(CurScript.ScriptFileName + ".cs", true);
              }
@@ -7686,7 +7840,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          }
          else if (CurScript.ScriptType == ScriptType.ScriptableObj)
          {
-@@ -427,7 +392,7 @@
+@@ -427,7 +387,7 @@
              {
                  var thisClassType = CurClass.ThisClassType;
  
@@ -7695,7 +7849,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
                  {
                      string newScriptablePath = EditorUtility.SaveFilePanelInProject("Save Scriptable Object", CurClass.Config.Name, "asset", "Save Scriptable Object", Application.dataPath);
  
-@@ -448,7 +413,7 @@
+@@ -448,7 +408,7 @@
                      BConsole.EditorLog("The script must be compiled before creating scriptable object.", 0);
                  }
              }
@@ -7704,7 +7858,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
              GUI.Label(labelrect, "Create", Res.Label);
              labelrect.y += 12;
              labelrect.x -= 8;
-@@ -459,7 +424,7 @@
+@@ -459,7 +419,7 @@
              if (DrawButton("Launch App", Res.Button_ExecuteApp))
              {
                  string appPath = Application.dataPath.Replace("/Assets", "/" + CurScript.ScriptName + ".exe");
@@ -7713,7 +7867,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
                  {
                      System.Diagnostics.Process.Start(appPath);
                  }
-@@ -483,8 +446,10 @@
+@@ -483,8 +441,10 @@
          public string MethodName = "";
          public List<Node_Pin> TypeParams = new List<Node_Pin>();
          public MethodInfo mInfo;
@@ -7725,7 +7879,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
          public MethodInvokeInfo(MethodInfo mInf)
          {
-@@ -499,7 +464,7 @@
+@@ -499,7 +459,7 @@
              {
                  TypeParams.Add(new Node_Pin(pInf.ParameterType, pInf.Name, PinTypeE.Undefined, 0));
  
@@ -7734,7 +7888,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
                  if (pInf != pInfos[pInfos.Length - 1])
                      DisplayName += ", ";
-@@ -522,7 +486,7 @@
+@@ -522,7 +481,7 @@
              if (TypeParams.Count == 0)
                  return new object[0];
  
@@ -7743,7 +7897,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
              return TypeParams.Select((x, y) => x.TempVar_TempVarHolder.GetTempVar_Undef()).ToArray();
          }
-@@ -537,7 +499,7 @@
+@@ -537,7 +494,7 @@
          CurClass.InvokeMethidsList = new List<MethodInvokeInfo>();
          CurClass.InvokeMethidsDisplayNameList = new List<string>();
  
@@ -7752,7 +7906,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
  
          foreach (MethodInfo mInf in mInfos)
          {
-@@ -569,14 +530,13 @@
+@@ -569,14 +525,13 @@
      {
          if (CurScript == null)
              return;
@@ -7772,7 +7926,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          if (CurScript.b_DebugMode)
          {
              if (CurScript.DebugObjectID == -2)
-@@ -594,10 +552,10 @@
+@@ -594,10 +547,10 @@
  
                  if (CurScript.SelectedDebugObject != null)
                  {
@@ -7786,7 +7940,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
                          BP_Utils.InvokeSequenceDelegate = ReceiveInvoke;
                          SM_Utils.InvokeSMDelegate = ReceiveSMInvoke;
  
-@@ -729,10 +684,6 @@
+@@ -729,10 +679,6 @@
          }
      }
  
@@ -7797,7 +7951,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
      private UnityEngine.Object[] DebugScripts;
  
      private void SearchDebugObjects()
-@@ -744,26 +695,28 @@
+@@ -744,26 +690,28 @@
          else
          {
              DebugScripts = FindObjectsOfType<Behaviour>().Where(x => x.GetType().Name == CurClass.ThisClassType.Name).ToArray();
@@ -7835,7 +7989,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_ControlBar.cs Editor/m_Contr
          public DebugObjInfo(Behaviour MB, string name)
          {
              script = MB;
-@@ -810,51 +765,48 @@
+@@ -810,51 +760,48 @@
      {
          GUI.enabled = !locked;
  
@@ -11340,7 +11494,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_FunctionNamesListWindow.cs E
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_InfoMessage.cs Editor/m_InfoMessage.cs
 --- .Editor/m_InfoMessage.cs	2016-03-23 09:59:16.105880300 +0700
-+++ Editor/m_InfoMessage.cs	2018-06-28 15:37:33.220541200 +0700
++++ Editor/m_InfoMessage.cs	2018-06-29 16:33:02.832458300 +0700
 @@ -1,13 +1,7 @@
 -﻿using UnityEditor;
 -using System.Collections.Generic;
@@ -11376,7 +11530,29 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_InfoMessage.cs Editor/m_Info
  
              private float Alpha = 1;
  
-@@ -96,38 +88,26 @@
+@@ -80,54 +73,44 @@
+ 
+             private float drawPosX = 10;
+ 
+-            private float DrawPosY_Lerp = BPE.position.height * 0.8f;
++            private float DrawPosY_Lerp = 0f;
+             private float DrawPosX_Lerp = BPE.position.width;
+ 
+-
+             public void DrawMessage(float drawOffset)
+             {
++                if (DrawPosY_Lerp == 0) // headstart
++                    DrawPosY_Lerp = BPE.position.height * 0.8f - drawOffset;
++
+                 Color drawColor = new Color(1, 1, 1, Alpha);
+                 float targetPosX = BPE.position.width - (drawPosX + 5);
+ 
+-                DrawPosY_Lerp = Mathf.Lerp(DrawPosY_Lerp, BPE.position.height * 0.8f - drawOffset, 0.03f);
+-                DrawPosX_Lerp = Mathf.Lerp(DrawPosX_Lerp, targetPosX, 0.03f);
++                DrawPosY_Lerp = Mathf.Lerp(DrawPosY_Lerp, BPE.position.height * 0.8f - drawOffset, 0.05f);
++                DrawPosX_Lerp = Mathf.Lerp(DrawPosX_Lerp, targetPosX, 0.05f);
+ 
+                 DrawRect.position = new Vector2(DrawPosX_Lerp, DrawPosY_Lerp);
                  DrawRect.size = new Vector2(drawPosX, 56);
                  drawPosX = 10;
  
@@ -11400,15 +11576,15 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_InfoMessage.cs Editor/m_Info
 -                
 -                float labelOffset_Mess = CalcStringPixelsX(Message, Res.BigWindowLabel);
 -        
+-
+-
  
 +                float labelOffset_Mess = CalcStringPixelsX(Message, Res.BigWindowLabel);
  
-+                GUI.color = drawColor;
- 
--
 -                GUI.color = drawColor; 
 -
--
++                GUI.color = drawColor;
+ 
 -                Rect messageRect = CreateRect(DrawRect.x + drawPosX, DrawRect.y + 15, labelOffset_Mess + 10, 30);
 +                Rect messageRect = new Rect(DrawRect.x + drawPosX, DrawRect.y + 15, labelOffset_Mess + 10, 30);
                  GUI.Label(messageRect, Message, Res.BigWindowLabel);
@@ -11421,7 +11597,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_InfoMessage.cs Editor/m_Info
                  drawPosX += Mathf.Max(labelOffset_Mess, 150);
  
                  drawPosX += 10;
-@@ -132,10 +112,6 @@
+@@ -132,10 +115,6 @@
  
                  drawPosX += 10;
  
@@ -11432,7 +11608,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_InfoMessage.cs Editor/m_Info
                  if (DrawStage == 0)
                  {
                      Offset += 3;
-@@ -147,7 +123,7 @@
+@@ -147,7 +126,7 @@
                  {
                      LifeTime -= 0.01f;
  
@@ -11441,7 +11617,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_InfoMessage.cs Editor/m_Info
                          DrawStage = 2;
                  }
                  else if (DrawStage == 2)
-@@ -163,4 +139,4 @@
+@@ -163,4 +142,4 @@
              }
          }
      }
@@ -11734,7 +11910,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_Linking.cs Editor/m_Linking.
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_NewNodeWindow.cs
 --- .Editor/m_NewNodeWindow.cs	2017-09-11 13:17:22.712801700 +0700
-+++ Editor/m_NewNodeWindow.cs	2018-06-28 15:37:33.242445300 +0700
++++ Editor/m_NewNodeWindow.cs	2018-06-29 17:17:34.134206000 +0700
 @@ -1,12 +1,9 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -11772,7 +11948,17 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
          public void Close()
          {
-@@ -55,30 +49,22 @@
+@@ -50,7 +43,9 @@
+             s_SearchString = "";
+             s_SearchStringClear = "";
+             NNW_DragItem = null;
++            EditorGUIUtility.editingTextField = false;
+         }
++
+         public void Show(Vector2 Pos, bool FromConnPin, bool OpenAllGroupsOnce, bool CloseAllGroupsOnce)
+         {
+             if (b_Active)
+@@ -55,30 +50,22 @@
          {
              if (b_Active)
                  return;
@@ -11805,7 +11991,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
              FilterBase();
  
-@@ -91,30 +77,22 @@
+@@ -91,30 +78,22 @@
  
          private const float Height = 600;
          private const float Width = 400;
@@ -11842,7 +12028,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  DrawRect = GUI.Window(6, DrawRect, NewNodeWindowFunction, "", Res.EmptyStyle);
  
                  if (_LMB_Up)
-@@ -148,9 +124,6 @@
+@@ -148,9 +125,6 @@
                          Close();
                      }
                  }
@@ -11852,7 +12038,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              }
          }
  
-@@ -163,254 +135,169 @@
+@@ -163,254 +136,169 @@
  
          void NewNodeWindowFunction(int windowID)
          {
@@ -12180,7 +12366,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              RealScrollRect.y = v_NewNodeScroll.y + 30;
              RealScrollRect.x = 0;
  
-@@ -414,11 +301,9 @@
+@@ -414,11 +302,9 @@
              RealScrollRect.y = v_NewNodeScroll.y + 30;
              RealScrollRect.x = 0;
  
@@ -12193,7 +12379,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              {
                  if (assem.b_Used)
                  {
-@@ -426,16 +311,12 @@
+@@ -426,16 +312,12 @@
  
                      if (!custom)
                      {
@@ -12212,7 +12398,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                      }
                      else
                      {
-@@ -445,7 +326,7 @@
+@@ -445,7 +327,7 @@
  
                      if (assem.b_Opened)
                      {
@@ -12221,7 +12407,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                          {
                              node.DrawListItems();
                          }
-@@ -471,58 +351,51 @@
+@@ -471,58 +352,51 @@
  
              ItemsDrawPos += 5;
  
@@ -12290,7 +12476,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                      {
                          GUIToolTipe = favNode.Name + " " + favNode.FullMemberName;
                      }
-@@ -533,7 +406,7 @@
+@@ -533,7 +407,7 @@
                          {
                              var foundNodeGP = DefaultNodes_FlowControl.Find(x => x.DNodeType == favNode.DefaultNodeType);
  
@@ -12299,7 +12485,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                                  foundNodeGP = DefaultNodes_Math.Find(x => x.DNodeType == favNode.DefaultNodeType);
  
                              if (foundNodeGP != null)
-@@ -553,7 +426,7 @@
+@@ -553,7 +427,7 @@
  
                              var type = GetTypeByName(favNode.FullAssmbName, ref favNode.FullTypeName);
  
@@ -12308,7 +12494,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              {
                                  Debug.LogError("Can't load type: " + favNode.FullAssmbName + " from assembly: " + favNode.FullTypeName);
                                  return;
-@@ -565,11 +438,10 @@
+@@ -565,11 +439,10 @@
  
                                  foreach (var ctor in ctors)
                                  {
@@ -12321,7 +12507,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                                      {
                                          if (!first)
                                              first = true;
-@@ -587,9 +459,9 @@
+@@ -587,9 +460,9 @@
                                      }
                                  }
  
@@ -12333,7 +12519,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                                      {
                                          SpawnData = ctors[0];
                                          Debug.LogError("Can't find constructor mach parameters, selecting first..");
-@@ -621,11 +493,10 @@
+@@ -621,11 +494,10 @@
                                      if (method.Name != favNode.MemberName)
                                          continue;
  
@@ -12346,7 +12532,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                                      {
                                          if (!first)
                                              first = true;
-@@ -684,20 +553,17 @@
+@@ -684,20 +554,17 @@
                          }
                      }
  
@@ -12369,7 +12555,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              }
              ItemsDrawPos += 30;
  
-@@ -701,8 +567,7 @@
+@@ -701,8 +568,7 @@
              }
              ItemsDrawPos += 30;
  
@@ -12379,7 +12565,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              {
                  InitAssemlies();
                  b_AssembliesOpened = !b_AssembliesOpened;
-@@ -725,15 +583,14 @@
+@@ -725,15 +584,14 @@
                      if (assem.AssemblyName.Contains("&&") || assem.AssemblyName == "")
                          continue;
  
@@ -12397,7 +12583,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
                      if (assem.Used != used)
                      {
-@@ -748,11 +605,8 @@
+@@ -748,11 +606,8 @@
                  }
              }
  
@@ -12410,7 +12596,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
              if (b_WindowSearchFocus || GUI.GetNameOfFocusedControl() != "NewNodeSearchTextField")
              {
-@@ -760,13 +614,10 @@
+@@ -760,13 +615,10 @@
                  b_WindowSearchFocus = false;
                  GUI.FocusWindow(windowID);
              }
@@ -12425,7 +12611,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
          public static void SpawnNewNode(object meth, Vector2 pos)
          {
-@@ -779,13 +630,13 @@
+@@ -779,13 +631,13 @@
  
              Linking.TryLinkToNode(newNode);
  
@@ -12441,7 +12627,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
          }
  
          public static object NNW_DragItem = null;
-@@ -796,13 +647,11 @@
+@@ -796,13 +648,11 @@
              public string NodesGroupName = "";
              public bool b_GroupListOpen = false;
  
@@ -12457,7 +12643,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
                  if (NewNode_Window.RealScrollRect.Contains(drawrect.position))
                  {
-@@ -827,7 +674,7 @@
+@@ -827,7 +675,7 @@
              {
                  get
                  {
@@ -12466,7 +12652,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  }
              }
  
-@@ -835,11 +682,9 @@
+@@ -835,11 +683,9 @@
              {
                  SpawnGroup();
  
@@ -12479,7 +12665,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
                      if (TypeData.CustomNodes.Count > 0)
                      {
-@@ -928,9 +769,9 @@
+@@ -928,9 +770,9 @@
                                  {
                                      if (attr is ObsoleteAttribute)
                                      {
@@ -12491,7 +12677,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                                              attrib = attr as ObsoleteAttribute;
                                          }
  
-@@ -1017,7 +855,7 @@
+@@ -1017,7 +856,7 @@
  
              private void GetDocForItem(string itemName, object LItem)
              {
@@ -12500,7 +12686,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  {
                      DocInfoResult = null;
                      optimizeDocItem = itemName;
-@@ -1025,7 +863,7 @@
+@@ -1025,7 +864,7 @@
                      DocInfoResult = DocInfo.GetXmlDocumentation(LItem);
                  }
              }
@@ -12509,7 +12695,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              private void DrawItem(string LItemName, object LItem, Rect drawRect)
              {
                  var favRect = drawRect;
-@@ -1032,13 +870,12 @@
+@@ -1032,13 +871,12 @@
                  favRect.x += favRect.width;
                  favRect.width = 25.0f;
  
@@ -12527,7 +12713,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
                      if (LItem is NodeGenPins)
                      {
-@@ -1058,10 +895,9 @@
+@@ -1058,10 +896,9 @@
                              newFavNode.FullTypeName = ci.DeclaringType.FullName;
                              newFavNode.FullAssmbName = ci.DeclaringType.Assembly.FullName;
  
@@ -12539,7 +12725,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              {
                                  if (!first)
                                      first = true;
-@@ -1097,12 +933,11 @@
+@@ -1097,12 +934,11 @@
                              newFavNode.FullTypeName = mi.DeclaringType.FullName;
                              newFavNode.FullAssmbName = mi.DeclaringType.Assembly.FullName;
  
@@ -12554,7 +12740,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              {
                                  if (!first)
                                      first = true;
-@@ -1161,7 +995,7 @@
+@@ -1161,7 +996,7 @@
                      NewNode_Window.Close();
                  }
  
@@ -12563,7 +12749,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  {
                      NNW_DragItem = LItem;
                      NNW_DragItem_Name = LItemName;
-@@ -1174,17 +1007,15 @@
+@@ -1174,17 +1008,15 @@
                  drawRect.height = 10;
                  drawRect.width = 10;
  
@@ -12582,7 +12768,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
  
                  if (LItem is ConstructorInfo || LItem is StructConstructorInfo)
                  {
-@@ -1250,13 +1081,9 @@
+@@ -1250,13 +1082,9 @@
                  }
                  else
                  {
@@ -12597,7 +12783,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              }
          }
  
-@@ -1273,7 +1099,7 @@
+@@ -1273,7 +1100,7 @@
              if (CurScript == null)
                  return;
  
@@ -12606,7 +12792,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              {
                  return;
              }
-@@ -1288,17 +1114,18 @@
+@@ -1288,17 +1115,18 @@
              {
                  b_Filtering = true;
                  LoadingProgress = 0;
@@ -12631,7 +12817,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              {
                  b_Filtering = false;
                  b_AbortThread = true;
-@@ -1316,19 +1142,17 @@
+@@ -1316,19 +1143,17 @@
          private bool b_Abort_RepeatFilter = false;
          private bool b_AbortThread = false;
  
@@ -12653,7 +12839,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
              LoadingProgress = 1;
              b_Filtering = false;
              m_Thread.Abort();
-@@ -1356,9 +1180,9 @@
+@@ -1356,9 +1181,9 @@
  
                  b_OpenAllGroups = !EmptyFilters;
  
@@ -12665,7 +12851,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  NodesCount = 0;
                  if (CurScript == null)
                      return;
-@@ -1368,34 +1192,41 @@
+@@ -1368,34 +1193,41 @@
                      if (CurScript == null)
                          return;
                      LoadingProgress += 1.0f / CurScript.NS_LoadedList.Count;
@@ -12719,7 +12905,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                          AsItem.NodesList.Add(TypeMPList);
                      }
  
-@@ -1418,44 +1248,41 @@
+@@ -1418,44 +1249,41 @@
              {
                  //if (Options.b_ShowDebug) Debug.Log("Error in the Init_NewNodeWindowItems thread. Exception: " + e);
              }
@@ -12777,7 +12963,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  bool add = false;// SearchByType;
  
                  if (SearchFilterType == SearchVarType.All || SearchFilterType == SearchVarType.Method)
-@@ -1478,7 +1305,7 @@
+@@ -1478,7 +1306,7 @@
                                  {
                                      bool isBaseClass = reflectedType == inheritClassBType.PType;
  
@@ -12786,7 +12972,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                                      {
                                          bool isSubcl = reflectedType.IsSubclassOf(inheritClassBType.PType);
                                          if (!isSubcl)
-@@ -1491,16 +1318,16 @@
+@@ -1491,16 +1319,16 @@
                                  }
                              }
                          }
@@ -12806,7 +12992,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              if (TestItem(LItem, LItem.Name, LItem.DeclaringType.Name, filterAssem.Type))
                              {
                                  filterAssem.Methods.Add(LItem);
-@@ -1531,7 +1356,7 @@
+@@ -1531,7 +1357,7 @@
  
                          if (lastName != LItem.Name)
                          {
@@ -12815,7 +13001,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              if (TestItem(LItem, LItem.Name, LItem.DeclaringType.Name, filterAssem.Type))
                              {
                                  filterAssem.Properties.Add(LItem);
-@@ -1553,7 +1378,7 @@
+@@ -1553,7 +1379,7 @@
  
                          if (lastName != LItem.DeclaringType.Name)
                          {
@@ -12824,7 +13010,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              if (TestItem(LItem, LItem.DeclaringType.Name, "new ", filterAssem.Type))
                              {
                                  filterAssem.Constructors.Add(LItem);
-@@ -1570,7 +1394,7 @@
+@@ -1570,7 +1395,7 @@
                      {
                          if (lastName != LItem.StructType.Name)
                          {
@@ -12833,7 +13019,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              if (TestItem(LItem, LItem.StructType.Name, "new ", filterAssem.Type))
                              {
                                  filterAssem.StructConstructors.Add(LItem);
-@@ -1594,13 +1418,12 @@
+@@ -1594,13 +1419,12 @@
                          {
                              continue;
                          }
@@ -12849,7 +13035,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                                  filterAssem.Fields.Add(LItem);
                                  lastName = LItem.Name;
                                  add = true;
-@@ -1625,7 +1448,7 @@
+@@ -1625,7 +1449,7 @@
  
                          if (lastName != LItem.Name)
                          {
@@ -12858,7 +13044,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              if (TestItem(LItem, LItem.Name, LItem.DeclaringType.Name, filterAssem.Type))
                              {
                                  filterAssem.Events.Add(LItem);
-@@ -1636,8 +1459,7 @@
+@@ -1636,8 +1460,7 @@
                          }
                      }
                  }
@@ -12868,7 +13054,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  lastName = "";
                  //if (!Options.b_DeclearedType)
                  {
-@@ -1656,7 +1478,7 @@
+@@ -1656,7 +1479,7 @@
  
                  if (add || (!Linking.IsLinkingSomething && s_SearchStringClear.Length > 0 && TestSearchName(s_SearchStringClear, AssembTypes.Name, Options.SearchFilterType)))
                  {
@@ -12877,7 +13063,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  }
              }
              return FilteredTypes;
-@@ -1672,7 +1494,6 @@
+@@ -1672,7 +1495,6 @@
              {
                  return ((propertyInfo.CanRead && propertyInfo.GetGetMethod() != null) || (propertyInfo.CanWrite && propertyInfo.GetSetMethod() != null));
              }
@@ -12885,7 +13071,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
          }
  
          private bool CheckField(FieldInfo field)
-@@ -1715,12 +1536,10 @@
+@@ -1715,12 +1537,10 @@
              bool PlacingSearchFilter = true;
              bool PlacingConPinFilter = true;
  
@@ -12899,7 +13085,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  if (!PlacingSearchFilter)
                      return false;
              }
-@@ -1750,16 +1569,15 @@
+@@ -1750,16 +1570,15 @@
                      }
                      else
                      {
@@ -12918,7 +13104,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                              PlacingConPinFilter = true;
                      }
                      else if (Linking.NodePin.PinType == PinTypeE.PinOut)
-@@ -1770,8 +1588,8 @@
+@@ -1770,8 +1589,8 @@
                      }
                      else
                      {
@@ -12929,7 +13115,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
                  }
              }
  
-@@ -1800,4 +1616,4 @@
+@@ -1800,4 +1617,4 @@
          Constructor = 16,
          Event = 32
      }
@@ -12938,8 +13124,8 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewNodeWindow.cs Editor/m_Ne
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewScriptWIndow.cs Editor/m_NewScriptWIndow.cs
 --- .Editor/m_NewScriptWIndow.cs	2018-03-21 14:52:46.534969700 +0700
-+++ Editor/m_NewScriptWIndow.cs	2018-06-28 15:37:33.268452500 +0700
-@@ -1,12 +1,10 @@
++++ Editor/m_NewScriptWIndow.cs	2018-06-29 18:47:42.884745800 +0700
+@@ -1,21 +1,20 @@
 -﻿using UnityEditor;
 +﻿using System;
  using System.Collections.Generic;
@@ -12956,6 +13142,18 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_NewScriptWIndow.cs Editor/m_
  
  public partial class Nottorus : EditorWindow
  {
+-    public static NewScript_WIndow NewScriptWIndow = new NewScript_WIndow();
++    public static NewScript_Window NewScriptWindow = new NewScript_Window();
+     public static ScriptType NewScript_SelectedScriptVariant = ScriptType.Undefined;
+     public static string NewScript_Description = "";
+ 
+     public class _None_ { }
+-    public class NewScript_WIndow
++
++    public class NewScript_Window
+     {
+         public bool b_Active = false;
+ 
 @@ -26,7 +25,7 @@
  
              b_Active = true;
@@ -15706,7 +15904,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_Node_Pin.cs Editor/m_Node_Pi
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OpenWindow.cs Editor/m_OpenWindow.cs
 --- .Editor/m_OpenWindow.cs	2017-01-08 10:35:33.188009600 +0700
-+++ Editor/m_OpenWindow.cs	2018-06-28 15:37:33.400485600 +0700
++++ Editor/m_OpenWindow.cs	2018-06-29 18:47:41.677438400 +0700
 @@ -1,12 +1,9 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -15724,8 +15922,12 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OpenWindow.cs Editor/m_OpenW
  
  public partial class Nottorus : EditorWindow
  {
-@@ -21,12 +18,9 @@
-             if (NewScriptWIndow.b_Active)
+@@ -18,15 +15,12 @@
+ 
+         public void Show()
+         {
+-            if (NewScriptWIndow.b_Active)
++            if (NewScriptWindow.b_Active)
                  return;
  
 -       
@@ -15737,6 +15939,15 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OpenWindow.cs Editor/m_OpenW
              //if (Options.GetGenericParameterValue<bool>("SearchScriptsOpen", false))
              {
                  InitSearchScripts();
+@@ -34,7 +28,7 @@
+ 
+             if (ScriptsList.Count == 0)
+             {
+-                NewScriptWIndow.b_Active = true;
++                NewScriptWindow.b_Active = true;
+                 return;
+             }
+             b_Active = true;
 @@ -48,7 +42,7 @@
          {
              if (b_Active)
@@ -15772,7 +15983,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OpenWindow.cs Editor/m_OpenW
              {
                  b_Active = false;
 -                NewScriptWIndow.Show();           
-+                NewScriptWIndow.Show();
++                NewScriptWindow.Show();
              }
  
 -
@@ -15985,13 +16196,13 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OpenWindow.cs Editor/m_OpenW
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_OptionsCFG.cs
 --- .Editor/m_OptionsCFG.cs	2018-03-21 14:29:37.689140400 +0700
-+++ Editor/m_OptionsCFG.cs	2018-06-28 15:37:33.416489300 +0700
-@@ -1,19 +1,13 @@
++++ Editor/m_OptionsCFG.cs	2018-06-29 17:39:40.426489200 +0700
+@@ -1,19 +1,14 @@
 -﻿using UnityEditor;
--using System.Collections.Generic;
++﻿using System;
+ using System.Collections.Generic;
 -using UnityEngine;
 -
-+﻿using System.Collections.Generic;
  using System.IO;
 -using System;
 -using System.Reflection;
@@ -16010,7 +16221,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
      public static EditorOptions Options
      {
          get
-@@ -38,7 +31,7 @@
+@@ -38,7 +32,7 @@
      public class FavoriteNode
      {
          public string Name;
@@ -16019,7 +16230,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
          public NodeTypeE NodeType;
          public DefNodeType DefaultNodeType;
          public string FullTypeName;
-@@ -47,12 +40,13 @@
+@@ -47,12 +41,13 @@
          public string FullMemberName;
      }
  
@@ -16037,7 +16248,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
          public int OpenLastScripts = 2;
  
          public bool SortBy_LastAccess = true;
-@@ -75,9 +69,7 @@
+@@ -75,9 +70,7 @@
          public bool b_DeclearedType = false;
  
          public SearchStringType SearchFilterType = SearchStringType.Contains;
@@ -16048,7 +16259,30 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
          public List<string> LastScriptsPaths = new List<string>();
          public const string TempFileName = EditorFolder + "NottorusOptions.ini";
  
-@@ -146,6 +138,7 @@
+@@ -85,6 +78,11 @@
+         public string sCustomNameScriptPromotedVarAlias = "$pinname$_$pintype$_var";
+         public string sCustomNameLocalPromotedVarAlias = "_$pinname$_$pintype$_var";
+ 
++        public bool IsDeleteKey(KeyCode keyCode)
++        {
++            return keyCode == KeyCode.Delete || keyCode == KeyCode.Backspace;
++        }
++
+         public string PluginVariant_Name_p1 = "Plugins";
+         public string PluginVariant_Name_p2 = "My Plugin";
+ 
+@@ -136,9 +134,7 @@
+         public bool PlaceVariant_NodeWidth = false;
+ 
+         public int PlaceVariant_OffsetType = 3;
+-
+-        public KeyCode DeleteKey = KeyCode.Delete;
+-
++        
+         public bool bPreventHotkeysSpam = false;
+ 
+         //public byte[] Variants = new byte[0];
+@@ -146,6 +142,7 @@
          public List<FavoriteNode> FavoriteNodes = new List<Nottorus.FavoriteNode>();
  
          public bool b_SortDefaultNodes = false;
@@ -16056,7 +16290,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
  
          public bool bShortTypeNameCompilation = false;
          public bool bShortTypeNameCompilation_ShowInfo = false;
-@@ -174,8 +167,8 @@
+@@ -174,8 +171,8 @@
                      Save();
                  }
              }
@@ -16067,7 +16301,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
          public T GetGenericParameterValue<T>(string parm, object DefaultValue)
          {
              Option fOpt = Parameters.Find(x => x.Parameter == parm);
-@@ -195,7 +189,7 @@
+@@ -195,7 +193,7 @@
          {
              string typeName = "";
  
@@ -16076,7 +16310,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
                  typeName = dNodeType.ToString();
              else
                  typeName = nodeType.ToString();
-@@ -217,9 +210,9 @@
+@@ -217,9 +214,9 @@
  
          private Color GetDefaultColor(string nodeType)
          {
@@ -16088,7 +16322,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
              {
                  case "ClassFunctionEntry":
                      return new Color32(138, 89, 36, 40);
-@@ -371,7 +432,7 @@
+@@ -371,7 +436,7 @@
  
          public void CheckSetupDefaultTypeColors(bool check = true)
          {
@@ -16097,7 +16331,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
              {
                  Options.TypeColors = new List<ColorSaver>();
                  TypeColors.Add(new ColorSaver("Type", new Color32(100, 100, 100, 255)));
-@@ -398,7 +458,9 @@
+@@ -398,7 +462,9 @@
              public string Parameter = "";
              public object Value = null;
  
@@ -16108,7 +16342,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
  
              public Option(string Parameter, object Value)
              {
-@@ -423,7 +485,7 @@
+@@ -423,7 +489,7 @@
              else
              {
                  Options = new EditorOptions();
@@ -16117,7 +16351,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
          }
  
          public static void Save()
-@@ -454,8 +516,15 @@
+@@ -454,8 +520,15 @@
  
      public class ColorSaver
      {
@@ -16135,7 +16369,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
          public ColorSaver(string name, Color32 color)
          {
              Name = name;
-@@ -473,4 +544,4 @@
+@@ -473,4 +548,4 @@
              return new UnityEngine.Color32(Color[0], Color[1], Color[2], Color[3]);
          }
      }
@@ -16144,7 +16378,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsCFG.cs Editor/m_Optio
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_OptionsPanel.cs
 --- .Editor/m_OptionsPanel.cs	2018-03-21 14:46:19.872374200 +0700
-+++ Editor/m_OptionsPanel.cs	2018-06-28 15:37:33.418490200 +0700
++++ Editor/m_OptionsPanel.cs	2018-06-29 17:02:29.004687800 +0700
 @@ -1,14 +1,9 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -16172,7 +16406,15 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
                  AwailableAssemblies = CurScript.UsedAsseblies.Select(x => x.AssemblyName).ToArray();
          }
  
-@@ -52,7 +48,7 @@
+@@ -38,7 +34,6 @@
+             b_Active = false;
+             Options.RepaintNodes = false;
+             EditorOptions.Save();
+-            bHandleDeleteKey = false;
+ 
+             if (TabWindowIndex == 1)
+                 InfoMessages.ShowMessage("Colors saved", 1);
+@@ -52,7 +47,7 @@
              if (b_Active)
              {
                  Height = DrawPosY;
@@ -16181,7 +16423,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
  
                  var labelDragRect = DrawRect;
                  labelDragRect.height = 40;
-@@ -105,20 +99,20 @@
+@@ -105,20 +98,20 @@
          {
              //GUI.BringWindowToFront(windowID);
  
@@ -16207,7 +16449,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
  
              if (DrawTab(0, "Main"))
                  DrawMainOptions();
-@@ -136,11 +131,11 @@
+@@ -136,11 +130,11 @@
              TabsDrawRect.width = CalcStringPixelsX(tabName, Res.NodePinLabel) + 20;
  
              if (TabWindowIndex == tabIndex)
@@ -16222,7 +16464,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
              GUI.Label(DrawlabelRect, tabName, Res.NodePinLabel);
  
              if (_LMB_Down && TabsDrawRect.Contains(Event.current.mousePosition))
-@@ -166,24 +159,23 @@
+@@ -166,24 +158,23 @@
  
              typesScrollHeight = Mathf.Clamp(typesScrollHeight, 30, 350);
  
@@ -16254,7 +16496,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
                  {
                      Options.TypeColors.Remove(typeColor);
                      break;
-@@ -196,26 +188,26 @@
+@@ -196,26 +187,26 @@
              DrawPosY += typesScrollHeight;
              DrawPosY += 5;
              ////////// Add new /////////////////
@@ -16287,7 +16529,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
  
              TypeColorsLength += 10;
              DrawPosY = 635;
-@@ -221,28 +213,27 @@
+@@ -221,28 +212,27 @@
              DrawPosY = 635;
          }
  
@@ -16327,7 +16569,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
                  {
                      Options.DefaultAssembliesToConnect.RemoveAt(i);
                      break;
-@@ -250,7 +241,7 @@
+@@ -250,7 +240,7 @@
                  DrawPosY += 22;
              }
              DrawPosY += 10;
@@ -16336,7 +16578,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
              {
                  Options.DefaultAssembliesToConnect.Add("");
              }
-@@ -276,9 +265,9 @@
+@@ -276,9 +264,9 @@
          private void DrawLabelsColorOptions()
          {
              Options.RepaintNodes = true;
@@ -16348,7 +16590,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
              DrawPosY += 5;
  
              if (SysNodeTypes.Length == 0)
-@@ -295,8 +283,8 @@
+@@ -295,8 +282,8 @@
              {
                  // selectedSysIndex = SysNodeTypes.ToList().IndexOf(SelectedSysNodeType);
              }
@@ -16359,7 +16601,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
  
              if (selectedSysIndex != newSysIndex)
              {
-@@ -308,10 +296,10 @@
+@@ -308,10 +295,10 @@
              if (SelectedSysSaver != null)
              {
                  Color sysColor = SelectedSysSaver.GetColor();
@@ -16372,7 +16614,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
              }
  
              DrawPosY += 25;
-@@ -323,13 +311,12 @@
+@@ -323,13 +310,12 @@
                  DefNodeTypes = allNames.ToArray();
              }
  
@@ -16389,7 +16631,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
  
              if (selectedDefIndex != newDefIndex)
              {
-@@ -343,15 +328,15 @@
+@@ -343,15 +327,15 @@
              if (SelectedDefSaver != null)
              {
                  Color sysColor = SelectedDefSaver.GetColor();
@@ -16408,7 +16650,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
              {
                  if (EditorUtility.DisplayDialog("Reset to default", "Do you reslly want to reset all label colors to default?", "Reset", "Cancel"))
                  {
-@@ -361,7 +346,7 @@
+@@ -361,7 +345,7 @@
  
              /*
              //DrawPosY += 25;
@@ -16417,11 +16659,14 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
              {
                  string code = "";
                  foreach (var color in Options.NodeLabelColors)
-@@ -377,27 +361,27 @@
+@@ -373,31 +357,28 @@
+             }
+             */
+             DrawPosY += 25;
+-
          }
  
-         private bool bHandleDeleteKey = false;
-+
+-        private bool bHandleDeleteKey = false;
          private void DrawMainOptions()
          {
 -
@@ -16452,7 +16697,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
              if (openAll)
                  Options.OpenLastScripts = 2;
  
-@@ -408,103 +391,106 @@
+@@ -408,168 +388,140 @@
              DrawPosY += 30;
  
              ///////////////////////////////////////////////////////////////////////////////////////////
@@ -16572,38 +16817,38 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
  
 -            Options.b_SortDefaultNodes = EditorGUI.Toggle(CreateRect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.b_SortDefaultNodes, Res.CheckBoxButton);
 -            GUI.Label(CreateRect(DrawRect.x + 30, DrawPosY, 200, 20), "Sort the default nodes alphabetically", Res.Label);
+-            DrawPosY += 20;
+-
+-            GUI.Label(CreateRect(DrawRect.x + 10, DrawPosY, 200, 20), "Delete key (for MAC users):", Res.Label);
+-            var deleteKey = EditorGUI.EnumPopup(CreateRect(DrawRect.x + 175, DrawPosY, 100, 20), Options.DeleteKey, Res.PopupButton);
+-            Options.DeleteKey = (KeyCode)deleteKey;
+-
+-            string handleText = bHandleDeleteKey ? "Cancel handle" : "Press for handle pressed button";
+-
+-            if (GUI.Button(CreateRect(DrawRect.x + 280, DrawPosY, 230, 20), handleText, Res.ButtonSimple))
+-            {
+-                bHandleDeleteKey = !bHandleDeleteKey;
+-            }
+-            if(bHandleDeleteKey)
+-            {
+-                if (Event.current.isKey && Event.current.keyCode != KeyCode.None)
+-                {
+-                    bHandleDeleteKey = false;
+-                    Options.DeleteKey = Event.current.keyCode;
+-                    EditorOptions.Save();
+-                }
+-            }
 +            Options.b_SortDefaultNodes = EditorGUI.Toggle(new Rect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.b_SortDefaultNodes, Res.CheckBoxButton);
 +            GUI.Label(new Rect(DrawRect.x + 30, DrawPosY, 200, 20), "Sort the default nodes alphabetically", Res.Label);
-+            DrawPosY += 20;
+             DrawPosY += 20;
+-
+-            Options.bPreventHotkeysSpam = EditorGUI.Toggle(CreateRect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.bPreventHotkeysSpam, Res.CheckBoxButton);
+-            GUI.Label(CreateRect(DrawRect.x + 30, DrawPosY, 200, 20), "Prevent hotkey spaming (CTRL+C/V) (for MAC users)", Res.Label);
 +            
 +            Options.b_SortMembers = EditorGUI.Toggle(new Rect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.b_SortMembers, Res.CheckBoxButton);
 +            GUI.Label(new Rect(DrawRect.x + 30, DrawPosY, 200, 20), new GUIContent( "Sort assembly members", "can make Nottorus slightly slower at initial load"), Res.Label);
-             DrawPosY += 20;
- 
--            GUI.Label(CreateRect(DrawRect.x + 10, DrawPosY, 200, 20), "Delete key (for MAC users):", Res.Label);
--            var deleteKey = EditorGUI.EnumPopup(CreateRect(DrawRect.x + 175, DrawPosY, 100, 20), Options.DeleteKey, Res.PopupButton);
-+            GUI.Label(new Rect(DrawRect.x + 10, DrawPosY, 200, 20), "Delete key (for MAC users):", Res.Label);
-+            var deleteKey = EditorGUI.EnumPopup(new Rect(DrawRect.x + 175, DrawPosY, 100, 20), Options.DeleteKey, Res.PopupButton);
-             Options.DeleteKey = (KeyCode)deleteKey;
- 
-             string handleText = bHandleDeleteKey ? "Cancel handle" : "Press for handle pressed button";
- 
--            if (GUI.Button(CreateRect(DrawRect.x + 280, DrawPosY, 230, 20), handleText, Res.ButtonSimple))
-+            if (GUI.Button(new Rect(DrawRect.x + 280, DrawPosY, 230, 20), handleText, Res.ButtonSimple))
-             {
-                 bHandleDeleteKey = !bHandleDeleteKey;
-             }
--            if(bHandleDeleteKey)
-+            if (bHandleDeleteKey)
-             {
-                 if (Event.current.isKey && Event.current.keyCode != KeyCode.None)
-                 {
-@@ -515,61 +501,51 @@
-             }
-             DrawPosY += 20;
- 
--            Options.bPreventHotkeysSpam = EditorGUI.Toggle(CreateRect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.bPreventHotkeysSpam, Res.CheckBoxButton);
--            GUI.Label(CreateRect(DrawRect.x + 30, DrawPosY, 200, 20), "Prevent hotkey spaming (CTRL+C/V) (for MAC users)", Res.Label);
++            DrawPosY += 20;
++            
 +            Options.bPreventHotkeysSpam = EditorGUI.Toggle(new Rect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.bPreventHotkeysSpam, Res.CheckBoxButton);
 +            GUI.Label(new Rect(DrawRect.x + 30, DrawPosY, 200, 20), "Prevent hotkey spaming (CTRL+C/V) (for MAC users)", Res.Label);
              DrawPosY += 20;
@@ -16627,15 +16872,15 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
 -#endif
 -            Options.b_UsePrecompiler = EditorGUI.Toggle(CreateRect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.b_UsePrecompiler, Res.CheckBoxButton);
 -            GUI.Label(CreateRect(DrawRect.x + 30, DrawPosY, 400, 20), "Use precompiler (Recommended)", Res.Label);
+-            DrawPosY += 20;
+-            GUI.enabled = true;
+-
+-            Options.CompileEmptyStateMachineFunctions = EditorGUI.Toggle(CreateRect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.CompileEmptyStateMachineFunctions, Res.CheckBoxButton);
+-            GUI.Label(CreateRect(DrawRect.x + 30, DrawPosY, 200, 20), "Compile Empty State Machine events", Res.Label);
 +            Options.CompileEmptyStateMachineFunctions = EditorGUI.Toggle(new Rect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.CompileEmptyStateMachineFunctions, Res.CheckBoxButton);
 +            GUI.Label(new Rect(DrawRect.x + 30, DrawPosY, 200, 20), "Compile Empty State Machine events", Res.Label);
              DrawPosY += 20;
--            GUI.enabled = true;
  
--            Options.CompileEmptyStateMachineFunctions = EditorGUI.Toggle(CreateRect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.CompileEmptyStateMachineFunctions, Res.CheckBoxButton);
--            GUI.Label(CreateRect(DrawRect.x + 30, DrawPosY, 200, 20), "Compile Empty State Machine events", Res.Label);
--            DrawPosY += 20;
--
 -            Options.bShortTypeNameCompilation = EditorGUI.Toggle(CreateRect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.bShortTypeNameCompilation, Res.CheckBoxButton);
 -            GUI.Label(CreateRect(DrawRect.x + 30, DrawPosY, 200, 20), "Compile short Type names (without namespace)(Recommended)", Res.Label);
 +            Options.bShortTypeNameCompilation = EditorGUI.Toggle(new Rect(DrawRect.x + 10, DrawPosY + 3, 20, 20), Options.bShortTypeNameCompilation, Res.CheckBoxButton);
@@ -16681,7 +16926,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
              {
                  Options.sCustomNameScriptPromotedVarAlias = "$pinname$_$pintype$_var";
                  Options.sCustomNameLocalPromotedVarAlias = "_$pinname$_$pintype$_var";
-@@ -579,27 +555,27 @@
+@@ -579,27 +531,27 @@
              DrawPosY += 20;
  
              labelOffset = CalcStringPixelsX("Public variables alias: ", Res.Label);
@@ -16717,7 +16962,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
                  {
                      SearchSkinsDir(Application.dataPath + "/");
                  }
-@@ -608,7 +584,7 @@
+@@ -608,7 +560,7 @@
              else
              {
                  DirectoryInfo dir = new DirectoryInfo(Options.SkinsDirectory);
@@ -16726,25 +16971,25 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_OptionsPanel.cs Editor/m_Opt
                  if (dir != null && dir.Exists)
                  {
                      skinNames = dir.GetDirectories().Select(x => x.Name).ToArray();
-@@ -621,13 +597,11 @@
+@@ -621,13 +573,11 @@
  
              DrawPosY += 20;
  
 -            GUI.Label(CreateRect(DrawRect.x + 10, DrawPosY, 200, 20), "Editor skin:", Res.Label);
 -            //DrawPosY += 20;
 -
--
--            var index = skinNames.ToList().IndexOf(Options.SkinName);
 +            GUI.Label(new Rect(DrawRect.x + 10, DrawPosY, 200, 20), "Editor skin:", Res.Label);
 +           
 +            var index = Array.IndexOf(skinNames, Options.SkinName);
  
+-            var index = skinNames.ToList().IndexOf(Options.SkinName);
+-
 -            index = EditorGUI.Popup(CreateRect(DrawRect.x + 80, DrawPosY + 2, 140, 20), index, skinNames, Res.PopupButton);
 +            index = EditorGUI.Popup(new Rect(DrawRect.x + 80, DrawPosY + 2, 140, 20), index, skinNames, Res.PopupButton);
  
              if (Options.SkinName != skinNames[index])
              {
-@@ -678,7 +650,4 @@
+@@ -678,7 +626,4 @@
          }
          return false;
      }
@@ -23505,7 +23750,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_TypeDataBase.cs Editor/m_Typ
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_TypeSelectListWindow.cs Editor/m_TypeSelectListWindow.cs
 --- .Editor/m_TypeSelectListWindow.cs	2018-02-10 22:28:03.316257000 +0700
-+++ Editor/m_TypeSelectListWindow.cs	2018-06-28 15:37:33.912618800 +0700
++++ Editor/m_TypeSelectListWindow.cs	2018-06-29 15:42:02.820488200 +0700
 @@ -1,8 +1,7 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -23630,8 +23875,16 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_TypeSelectListWindow.cs Edit
  
              if (s_SearchString != searchString)
              {
-@@ -176,7 +173,7 @@
+@@ -174,9 +171,15 @@
+                 FilterNames();
+             }
  
++            if (ev.keyCode == KeyCode.Return && "SelectNameSearchTextField" == GUI.GetNameOfFocusedControl())
++            {
++                if (FilteredTypes.Count > 0)
++                    SelectInher(FilteredTypes[0]);
++            }
++
              if (TypeDataBase.b_IsIniting)
              {
 -                ProgressBar.DrawWithLabel(CreateRect(20, Height / 2, Width - 40, 20), TypeDataBase.LoadProgress);
@@ -23639,7 +23892,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_TypeSelectListWindow.cs Edit
              }
  
              DrawPosY += 25;
-@@ -189,9 +186,7 @@
+@@ -189,9 +192,7 @@
  
              ///////////////////////////////////////////////////////
  
@@ -23650,7 +23903,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_TypeSelectListWindow.cs Edit
  
              DrawPosY = 0;
  
-@@ -195,19 +190,16 @@
+@@ -195,19 +196,16 @@
  
              DrawPosY = 0;
  
@@ -23673,7 +23926,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_TypeSelectListWindow.cs Edit
  
              DrawPosY += 20;
  
-@@ -211,11 +203,9 @@
+@@ -211,11 +209,9 @@
  
              DrawPosY += 20;
  
@@ -23686,7 +23939,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_TypeSelectListWindow.cs Edit
                  {
                      SelectInher(type);
                  }
-@@ -241,4 +228,4 @@
+@@ -241,4 +234,4 @@
      }
  
      public delegate void SelectVarReturnType(Type newType);
@@ -23901,7 +24154,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_UsedAssembly.cs Editor/m_Use
 +}
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_Utils.cs Editor/m_Utils.cs
 --- .Editor/m_Utils.cs	2018-03-21 13:46:23.497229000 +0700
-+++ Editor/m_Utils.cs	2018-06-28 17:41:38.852112000 +0700
++++ Editor/m_Utils.cs	2018-06-29 21:06:21.416375000 +0700
 @@ -1,51 +1,18 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -25074,7 +25327,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_Utils.cs Editor/m_Utils.cs
 \ No newline at end of file
 diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_VarsListWindow.cs
 --- .Editor/m_VarsListWindow.cs	2017-03-07 18:41:14.814696100 +0700
-+++ Editor/m_VarsListWindow.cs	2018-06-28 17:52:37.115139600 +0700
++++ Editor/m_VarsListWindow.cs	2018-06-29 19:09:52.524044900 +0700
 @@ -1,9 +1,8 @@
 -﻿using UnityEditor;
 +﻿using System;
@@ -25164,7 +25417,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
  
                  if (_LMB_Up)
                  {
-@@ -161,20 +162,19 @@
+@@ -161,14 +162,13 @@
          {
              //GUI.BringWindowToFront(windowID);
  
@@ -25181,25 +25434,35 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
              {
                  b_SearchStringShow = false;
              }
+@@ -173,8 +173,9 @@
+                 b_SearchStringShow = false;
+             }
  
++
              GUI.SetNextControlName("VarTypeListSearchTextField");
 -            string t_s_NewString = GUI.TextField(CreateRect(5, 5, 290, 20), s_SearchString, Res.SearchStringLine);
 +            string t_s_NewString = GUI.TextField(new Rect(5, 5, 290, 20), s_SearchString, Res.SearchStringLine);
  
              if (s_SearchString.Length == 0 && t_s_NewString.Length != 0)
              {
-@@ -192,25 +192,19 @@
+@@ -192,25 +193,26 @@
                  FilterItems();
              }
  
 -          
 -
--
++            if (ev.keyCode == KeyCode.Return)
++            {
++                var Item = VarItemsList_Filtered.FirstOrDefault(x => FilterByGroup.Length == 0 || FilterByGroup.Contains(x.GroupName));
++                if (Item != null && Item.ListItems.Count > 0)
++                    FeedbackNewType(Item.ListItems[0].type);
++            }
+ 
              if (b_SearchStringShow && s_SearchString.Length == 0)
 -                GUI.Label(CreateRect(10, 5, 50, 20), "Search");
+-
 +                GUI.Label(new Rect(10, 5, 50, 20), "Search");
  
--
 -          
 -
 -            GUI.Label(CreateRect(0, 25, 200, 20), "      Available Types:", Res.Label);
@@ -25219,7 +25482,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
  
              RealScrollRect = scrollRect;
              RealScrollRect.y = v_VarsScroll.y;
-@@ -220,7 +214,7 @@
+@@ -220,7 +222,7 @@
  
              if (SelVar is ScriptClass)
              {
@@ -25228,7 +25491,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                  GUI.Box(drawRect, "   " + RenameTypeVarName(typeof(None), true), Res.ListButton);
                  if (_LMB_Up && drawRect.Contains(Event.current.mousePosition))
                  {
-@@ -236,9 +230,12 @@
+@@ -236,9 +238,12 @@
              {
                  LItem.DrawListItem();
              }
@@ -25242,7 +25505,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                  if (FilterByGroup.Length > 0)
                  {
                      if (FilterByGroup.Contains(LItem.GroupName))
-@@ -253,10 +250,8 @@
+@@ -253,10 +258,8 @@
                  {
                      LItem.DrawListItem();
                  }
@@ -25253,7 +25516,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
              ItemsDrawPos += 5;
  
              b_CloseOnceAllGroups = false;
-@@ -278,23 +271,23 @@
+@@ -278,23 +279,23 @@
          {
              public string GroupName = "";
              public bool b_GroupListOpen = false;
@@ -25281,7 +25544,23 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                  }
                  ItemsDrawPos += 15;
              }
-@@ -347,7 +335,7 @@
+@@ -325,15 +325,10 @@
+                 }
+                 */
+ 
+-
+-
+-
+                 b_GroupSpawned = false;
+ 
+-
+                 foreach (TypeData Item in ListItems)
+                 {
+-                    var LItem = Item;//for delegate
+                     if (!b_GroupSpawned && GroupName != "-")
+                     {
+                         SpawnGroup();
+@@ -347,7 +342,7 @@
                              t_GroupOffset = 10;
                          }
  
@@ -25290,16 +25569,45 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
  
                          if (CurScript.VarsWindow.RealScrollRect.Contains(drawRect.position))
                          {
-@@ -371,7 +356,7 @@
+@@ -357,21 +351,19 @@
+                                 LMB_Down_Deleg = delegate { };
+                             }
  
-                             GUI.color = GetColorByType(LItem.type);
+-
+-
+-                            GUI.Box(drawRect, "   " + RenameTypeVarName(LItem.type, true), Res.ListButton);
++                            GUI.Box(drawRect, "   " + RenameTypeVarName(Item.type, true), Res.ListButton);
+ 
+                             if (_LMB_Up && drawRect.Contains(Event.current.mousePosition))
+                             {
+                                 //LMB_Up_Deleg = delegate
+                                 {
+-                                    FeedbackNewType(LItem.type);
++                                    FeedbackNewType(Item.type);
+                                 };
+                             }
+ 
+-                            GUI.color = GetColorByType(LItem.type);
++                            GUI.color = GetColorByType(Item.type);
  
 -                            var iconRect = CreateRect(5 + t_GroupOffset, ItemsDrawPos, 13, 13);
 +                            var iconRect = new Rect(5 + t_GroupOffset, ItemsDrawPos, 13, 13);
  
                              if (SelType != null && SelType.IsArray)
                                  GUI.DrawTexture(iconRect, Res.VarIconArray);
-@@ -388,11 +372,8 @@
+@@ -379,10 +371,9 @@
+                                 GUI.DrawTexture(iconRect, Res.VarIcon);
+                             GUI.color = Color.white;
+ 
+-
+                             if (iconRect.Contains(Event.current.mousePosition))
+                             {
+-                                GUIToolTipe = RenameType_ForCompilation(LItem.type);
++                                GUIToolTipe = RenameType_ForCompilation(Item.type);
+                             }
+                         }
+ 
+@@ -388,11 +379,8 @@
  
                          ItemsDrawPos += 15;
                      }
@@ -25311,7 +25619,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
          }
  
          private static void FeedbackNewType(Type LItem)
-@@ -472,8 +452,6 @@
+@@ -472,8 +459,6 @@
              if (EditorApplication.isCompiling || b_ThreadAbort)
                  return;
  
@@ -25320,7 +25628,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
              if (b_IsFiltering)
              {
                  b_Abort_RepeatFilter = true;
-@@ -481,10 +459,12 @@
+@@ -481,10 +466,12 @@
              else
              {
                  b_IsFiltering = true;
@@ -25336,7 +25644,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
          }
  
          public void AbortThread()
-@@ -521,10 +499,9 @@
+@@ -521,10 +506,9 @@
                  var searchType = TestSearchNameType(s_SearchString);
                  string searchL = s_SearchString.Replace(" ", "");
  
@@ -25348,23 +25656,23 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
  
                      foreach (var groupItem in VarItemsList_Draw)
                      {
-@@ -576,11 +552,11 @@
+@@ -576,11 +559,11 @@
              m_FilterThread = null;
          }
  
 -        private HashSet<Type> allTypeList = null;
 +        private List<Type> allTypeList = null;
-+
-+        public List<Type> classesTypeList = null;
  
 -         
 -        public HashSet<Type> classesTypeList = null;
 -        public HashSet<Type> ClassesTypes
++        public List<Type> classesTypeList = null;
++
 +        public List<Type> ClassesTypes
          {
              get
              {
-@@ -595,9 +571,9 @@
+@@ -595,9 +578,9 @@
              }
          }
  
@@ -25376,7 +25684,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
          {
              get
              {
-@@ -611,7 +587,8 @@
+@@ -611,7 +594,8 @@
                  return _interfacesTypeList;
              }
          }
@@ -25386,7 +25694,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
          {
              get
              {
-@@ -639,25 +616,28 @@
+@@ -639,25 +623,28 @@
  
          public System.Threading.Thread m_Thread = null;
  
@@ -25423,7 +25731,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
          public void InitBaseAsync()
          {
              try
-@@ -665,29 +645,30 @@
+@@ -665,29 +652,30 @@
                  ProcessingTypes = true;
                  LoadingProgress = 0;
  
@@ -25464,7 +25772,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                  }
  
                  foreach (TypeBase_NameSpaceceTypes NS in NSS)
-@@ -720,7 +699,7 @@
+@@ -720,7 +706,7 @@
              ProcessingTypes = false;
              LoadingProgress = 1;
  
@@ -25473,7 +25781,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                  m_Thread.Abort();
              m_Thread = null;
          }
-@@ -729,14 +708,14 @@
+@@ -729,14 +715,14 @@
  
          ////////////////////////////////////
  
@@ -25493,7 +25801,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                  {
                      result.Add(attrib.attribType);
                  }
-@@ -751,11 +730,12 @@
+@@ -751,11 +737,12 @@
              public AttributeTargets ValidOn = AttributeTargets.All;
          }
  
@@ -25509,7 +25817,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
  
              object[] attribs = attribType.GetCustomAttributes(typeof(AttributeUsageAttribute), true);
  
-@@ -763,17 +743,16 @@
+@@ -763,17 +750,16 @@
              {
                  AttributeUsageAttribute usage = attribs[0] as AttributeUsageAttribute;
                  atribAdd.ValidOn = usage.ValidOn;
@@ -25532,7 +25840,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
              {
                  if (attrTest == typeof(Attribute))
                      return true;
-@@ -788,7 +767,7 @@
+@@ -788,7 +774,7 @@
          {
              return
                  type == typeof(bool) ||
@@ -25541,7 +25849,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                  type == typeof(float) ||
                  type == typeof(string) ||
                  type == typeof(Transform) ||
-@@ -804,14 +783,14 @@
+@@ -804,14 +790,14 @@
          public void TryAddNewType(Type type)
          {
              string GroupName = "";
@@ -25558,7 +25866,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                  if (IsAttribute(type))
                  {
                      GroupName = "Attribute";
-@@ -860,7 +839,7 @@
+@@ -860,7 +846,7 @@
              }
  
              TypeData dtAdd = new TypeData();
@@ -25567,7 +25875,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
              if (dtAdd.Init(type))
              {
                  if (!allTypeList.Contains(type))
-@@ -873,15 +852,17 @@
+@@ -873,15 +859,17 @@
                      {
                          if (found.GroupName == GroupName)
                          {
@@ -25588,7 +25896,7 @@ diff -x '*.meta' -urB --strip-trailing-cr .Editor/m_VarsListWindow.cs Editor/m_V
                          VarItemsList_Init.Add(foundList);
                      }
  
-@@ -919,4 +900,4 @@
+@@ -919,4 +907,4 @@
              }
          }
      }

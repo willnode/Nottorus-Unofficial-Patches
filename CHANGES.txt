@@ -1,3 +1,16 @@
+commit 525faa2644462355e4bc7391c75329e23c172335
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Fri Jun 29 19:38:53 2018 +0700
+
+    NEW: Various keyboard shortcuts
+    
+    - Enter to select on type selection dialog
+    - Backspace / Delete to delete node objects
+    - Space at node to pop Insert Dialog
+    - Better Message Animation
+    - Shift+Alt+[(C -> Compile);(S -> Save);(Z -> Undo);(Y -> Redo);(O -> Open);(N -> New);(F -> Place Fit (all -- mode depending on option));(X -> Exclude nodes from sequence and delete)]
+    WARNING: Custom key option for delete has been removed (Both Backspace or Forward Delete are now accepted)
+
 commit 2b3a907e9b333b6d3b3204eb75424ca79fef970e
 Author: Wildan Mubarok <willnode@wellosoft.net>
 Date:   Fri Jun 29 08:35:56 2018 +0700
