@@ -14,11 +14,11 @@ See changes [in a table here](https://blog.wellosoft.net/en/nottorus-after-2-yea
 *(Requires [Git-SCM](https://git-scm.com/))*
 
 0. Extract Nottorus v2.0 into your project
-1. Extract `SourceCode.rar` in `Assets\Nottorus\src\SourceCode.rar` to `Assets\Nottorus\Editor`
+1. Extract `SourceCode.rar` in `Assets\Nottorus\src\SourceCode.rar` to `Assets\Nottorus\` (There should be `Editor` folder after extraction)
 2. Rename `Editor` to `.Editor` (Unity ignores any files/folder with a dot in beginning)
 3. Normalize Ending: Save [this script](https://gist.github.com/willnode/a6e76fcb9ac5d150df4a356b818a0ffe) to `.Editor` folder and run it, then delete the script.
 3. Delete `Nottorus_Plugin.dll` and `Addon_CSP.dll` from `Plugins`
-4. Open Bash/Git in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unofficial-Patches .Patches`
+4. Open Bash/Git in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unofficial-Patches .Patches` (There should be `.Patches` folder after cloning)
 5. In `Assets\Nottorus\` Folder, write this script to file:
 
 Mac/Linux (`UpdatePatch.sh`)
@@ -55,7 +55,9 @@ The [original Nottorus](http://u3d.as/qVo) still alive in Asset Store, so I can'
 
 You can submit Issues here (Yes, including editor features). I'll figure the solution as helpful as I can.
 
-If you want to contribute, here's a way to create the patch:
+If you have problem with installation, please check existing issues first before starting new one.
+
+If you want to contribute, here's how I create the patch:
 
 ```sh
 diff -x '*.meta' -urB --strip-trailing-cr .Editor Editor > .Patches/patch.diff
