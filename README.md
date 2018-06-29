@@ -1,6 +1,6 @@
 # [Nottorus](http://u3d.as/qVo) Unnoficial Patches
 
-### [Read my post for preamble of what is going on](https://blog.wellosoft.net/en/nottorus-after-2-years.html)
+### [Read my post for preamble about what is going on](https://blog.wellosoft.net/en/nottorus-after-2-years.html)
 
 Nottorus is a powerful plugin, first of its kind. Sadly the plugin author has walked away, and we're afraid of losing this masterpiece.
 
@@ -11,23 +11,12 @@ See changes [in a table here](https://blog.wellosoft.net/en/nottorus-after-2-yea
 
 ## Installing the Patch
 
-1. Download the [patch](patch.diff) (or Clone this repo)
-2. Extract `SourceCode.rar` in `Assets\Nottorus\src\SourceCode.rar` to `Assets\Nottorus\Editor`
-3. Delete `Nottorus_Plugin.dll` and `Addon_CSP.dll` from `Plugins`
-4. Put the `patch.diff` in `Assets\Nottorus\Editor`
-5. Open Unix Bash Shell in that `Editor` folder
-6. Run `patch < patch.diff`
-
-For Windows you can use WSL, Mingw or Cygwin to run Unix bash Shell (The MingW from Git SCM is probably enough).
-
-## Setup One-Click-Update-Via-Script
-
 *(Requires [Git-SCM](https://git-scm.com/))*
 
-If you want to keep listening for updates, patch steps above may require a tedious work. Here I figured an automated way to do this:
-
+0. Extract Nottorus v2.0 into your project
 1. Extract `SourceCode.rar` in `Assets\Nottorus\src\SourceCode.rar` to `Assets\Nottorus\Editor`
 2. Rename `Editor` to `.Editor` (Unity ignores any files/folder with a dot in beginning)
+3. Normalize Ending: Save [this script](https://gist.github.com/willnode/a6e76fcb9ac5d150df4a356b818a0ffe) to `.Editor` folder and run it, then delete the script.
 3. Delete `Nottorus_Plugin.dll` and `Addon_CSP.dll` from `Plugins`
 4. Open Bash/Git in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unnoficial-Patches .Patches`
 5. In `Assets\Nottorus\` Folder, write this script to file:
@@ -64,7 +53,7 @@ The [original Nottorus](http://u3d.as/qVo) still alive in Asset Store, so I can'
 
 ## Contributing
 
-You can submit Issues here (Yep, including editor features). I'll figure the solution as helpful as I can.
+You can submit Issues here (Yes, including editor features). I'll figure the solution as helpful as I can.
 
 If you want to contribute, here's a way to create the patch:
 
