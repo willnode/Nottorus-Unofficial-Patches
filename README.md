@@ -40,7 +40,7 @@ git pull origin master
 cd ..
 cp -R .Editor/ Editor/
 cd Editor
-patch -p1 < ../.Patches/patch.diff
+patch --binary -p1 < ../.Patches/patch.diff
 exit
 ```
 
@@ -52,7 +52,7 @@ git pull origin master
 cd ..
 xcopy /Y .Editor Editor
 cd Editor
-bash -c "patch -p1 < ../.Patches/patch.diff"
+bash -c "patch --binary -p1 < ../.Patches/patch.diff"
 exit
 ```
 
@@ -69,7 +69,7 @@ You can submit Issues here (Yep, including editor features). I'll figure the sol
 If you want to contribute, here's a way to create the patch:
 
 ```sh
-diff -x '*.meta' -uB .Editor Editor > .Patches/patch.diff
+diff -x '*.meta' -urB --strip-trailing-cr .Editor Editor > .Patches/patch.diff
 ```
 
 <!--
