@@ -1,4 +1,4 @@
-# [Nottorus](http://u3d.as/qVo) Unnoficial Patches
+# [Nottorus](http://u3d.as/qVo) Unofficial Patches
 
 ### [Read my post for preamble about what is going on](https://blog.wellosoft.net/en/nottorus-after-2-years.html)
 
@@ -18,7 +18,7 @@ See changes [in a table here](https://blog.wellosoft.net/en/nottorus-after-2-yea
 2. Rename `Editor` to `.Editor` (Unity ignores any files/folder with a dot in beginning)
 3. Normalize Ending: Save [this script](https://gist.github.com/willnode/a6e76fcb9ac5d150df4a356b818a0ffe) to `.Editor` folder and run it, then delete the script.
 3. Delete `Nottorus_Plugin.dll` and `Addon_CSP.dll` from `Plugins`
-4. Open Bash/Git in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unnoficial-Patches .Patches`
+4. Open Bash/Git in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unofficial-Patches .Patches`
 5. In `Assets\Nottorus\` Folder, write this script to file:
 
 Mac/Linux (`UpdatePatch.sh`)
