@@ -1,0 +1,113 @@
+commit 2b3a907e9b333b6d3b3204eb75424ca79fef970e
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Fri Jun 29 08:35:56 2018 +0700
+
+    Remove MD5 head and more bugfixes
+    
+    WARNING: MD5 hash now saved inside script data instead of compiled file.
+    Also few more bug fix regression from 09250f4
+
+commit de71431651cde93b2fa8f1f4418b4a8036d8ea77
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Wed Jun 20 03:28:18 2018 +0700
+
+    NEW: New node Enter to insert
+    
+    - Some cleanup
+    - Make undo capture slightly faster
+
+commit b987aa0d5341e84bc779c470ca1a918cc889891c
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Wed Jun 20 01:40:05 2018 +0700
+
+    Graphics.DrawTexture -> DrawTexture
+    
+    Doing this because Graphics.DrawTexture should only be called during repaint.
+    - See m_DrawUtils
+
+commit 09250f42239baf4780d89997f09dd252f7847f7f
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Tue Jun 19 22:17:43 2018 +0700
+
+    NEW: Superfast Save and Compilation ⚡
+    
+    - String -> StringBuilder
+    - Proper save stream redirection
+    - Put compilation on same thread
+    - Remove precompiler code
+    WARNING: Precompiler is removed (Seems it isn't allowed in MacOS and now doesn't work in latest unity version)
+
+commit 257584a547bcaa70bf6a682a4fd87f7b7e66ce5d
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Tue Jun 19 20:19:24 2018 +0700
+
+    NEW: Remember NewNode options
+    
+    - some cleanup
+
+commit fc204a537a6ac9fc0c08a566bf2387b1e3e361d2
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Tue Jun 19 19:07:30 2018 +0700
+
+    NEW: Ctrl+D (duplicate) and middle button == right button drag
+    
+    - some bugfix
+    - MAC ev.command?
+    - https://forum.unity.com/threads/395750/page-23#post-3466302
+
+commit e83837929885eef4f2fda74385b79a1118309f4a
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Tue Jun 19 01:15:12 2018 +0700
+
+    NEW: Superfast CPU Performance ⚡
+    
+    - Do not show private types and members for external assemblies 🔥
+    - Don't sort members by default (explicit option available)
+    - Remove excess ToList() and OrderBy()
+    - Change HashSet to List or Array (silly!)
+    - Add "Flush Cache" for debugging helper
+    - Fixed bug regression from c9af296
+
+commit 94f20edeeedf59cb393e504e1cd70300aa8a6b66
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Mon Jun 18 15:56:10 2018 +0700
+
+    NEW: PageUp + PageDown to adjust zoom
+
+commit c9af296dffc97c257c97fae4208d7d287e04a24e
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Mon Jun 18 15:55:30 2018 +0700
+
+    First cleanup
+
+commit b9f26d0d92e762e157bcf4ab217398b546c3a333
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Mon Jun 18 12:36:31 2018 +0700
+
+    Fix Style by Codemaid
+
+commit 6636ec9b69d97886301f07c1460945510ed556ea
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Mon Jun 18 12:02:21 2018 +0700
+
+    Remove Unnessary Usings
+
+commit fe71c439eab520abe177e50983c28cfb77ca9d13
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Mon Jun 18 11:56:37 2018 +0700
+
+    CreateRect() => new Rect()
+
+commit a730f78aba8d1e7fff1cc68db5e8e64c2505af23
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Sun Jun 17 01:16:12 2018 +0700
+
+    Compiler and VS style guide warning fixes
+    
+    WARNING: Stripped variables may contain useful debugging variables.
+
+commit 0787f393666eca61e44fb99be664fde1bde18f28
+Author: Wildan Mubarok <willnode@wellosoft.net>
+Date:   Sat Jun 16 23:14:03 2018 +0700
+
+    Initial Direct Extract of Nottorus v2.0
