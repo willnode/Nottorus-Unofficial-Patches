@@ -13,11 +13,12 @@ See changes [in a table here](https://blog.wellosoft.net/en/nottorus-after-2-yea
 
 1. Download the [patch](patch.diff) (or Clone this repo)
 2. Extract `SourceCode.rar` in `Assets\Nottorus\src\SourceCode.rar` to `Assets\Nottorus\Editor`
-3. Put the `patch.diff` in `Assets\Nottorus\Editor`
-4. Open Unix Bash Shell in that `Editor` folder
-5. Run `patch < patch.diff`
+3. Delete `Nottorus_Plugin.dll` and `Addon_CSP.dll` from `Plugins`
+4. Put the `patch.diff` in `Assets\Nottorus\Editor`
+5. Open Unix Bash Shell in that `Editor` folder
+6. Run `patch < patch.diff`
 
-For Windows you can use WSL or Cygwin to run Unix bash Shell.
+For Windows you can use WSL, Mingw or Cygwin to run Unix bash Shell (The MingW from Git SCM is probably enough).
 
 ## Setup One-Click-Update-Via-Script
 
@@ -27,8 +28,9 @@ If you want to keep listening for updates, patch steps above may require a tedio
 
 1. Extract `SourceCode.rar` in `Assets\Nottorus\src\SourceCode.rar` to `Assets\Nottorus\Editor`
 2. Rename `Editor` to `.Editor` (Unity ignores any files/folder with a dot in beginning)
-3. Open Bash/Git in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unnoficial-Patches .Patches`
-4. In `Assets\Nottorus\` Folder, write this script to file:
+3. Delete `Nottorus_Plugin.dll` and `Addon_CSP.dll` from `Plugins`
+4. Open Bash/Git in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unnoficial-Patches .Patches`
+5. In `Assets\Nottorus\` Folder, write this script to file:
 
 Mac/Linux (`UpdatePatch.sh`)
 
