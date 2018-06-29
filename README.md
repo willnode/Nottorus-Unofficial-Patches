@@ -39,7 +39,7 @@ Windows (`UpdatePatch.bat`) (Requires [WSL](https://docs.microsoft.com/en-us/win
 cd .Patches
 git pull origin master
 cd ..
-xcopy /Y .Editor Editor
+xcopy /E /Y .Editor Editor
 cd Editor
 bash -c "patch --binary -p1 < ../.Patches/patch.diff"
 exit
