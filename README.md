@@ -27,17 +27,17 @@ Mac/Linux (`UpdatePatch.sh`) (also Windows with Git-SCM's Bash Mingw)
 cd .Patches
 git pull origin master
 cd ..
+rm -rf Editor/
 cp -R .Editor/ Editor/
 cd Editor
 patch --binary -p1 < ../.Patches/patch.diff
-exit
 ```
 
 Windows (`UpdatePatch.bat`) using [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
 
 ```bat
 cd .Patches
-REM git pull origin master
+git pull origin master
 cd ..
 del /S /Q /F Editor>nul
 xcopy /I /E /Y .Editor Editor>nul
