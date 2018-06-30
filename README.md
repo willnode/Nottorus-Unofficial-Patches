@@ -16,12 +16,12 @@ See changes [in a table here](https://blog.wellosoft.net/en/nottorus-after-2-yea
 0. Extract Nottorus v2.0 into your project
 1. Extract `SourceCode.rar` in `Assets\Nottorus\src\SourceCode.rar` to `Assets\Nottorus\` (There should be `Editor` folder after extraction)
 2. Rename `Editor` to `.Editor` (Unity ignores any files/folder with a dot in beginning)
-3. Normalize Ending: Save [this script](https://gist.github.com/willnode/a6e76fcb9ac5d150df4a356b818a0ffe) to `.Editor` folder and run it, then delete the script.
+3. Normalize Ending: Save [this script (use normalize-lf)](https://gist.github.com/willnode/a6e76fcb9ac5d150df4a356b818a0ffe) to `.Editor` folder and run it, then delete the script.
 3. Delete `Nottorus_Plugin.dll` and `Addon_CSP.dll` from `Plugins`
-4. Open Bash/Git in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unofficial-Patches .Patches` (There should be `.Patches` folder after cloning)
+4. Open Bash/Git Bash in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unofficial-Patches .Patches` (There should be `.Patches` folder after cloning)
 5. In `Assets\Nottorus\` Folder, write this script to file:
 
-Mac/Linux (`UpdatePatch.sh`)
+Mac/Linux (`UpdatePatch.sh`) (also Windows with Git-SCM's Bash Mingw)
 
 ```sh
 cd .Patches
@@ -33,16 +33,17 @@ patch --binary -p1 < ../.Patches/patch.diff
 exit
 ```
 
-Windows (`UpdatePatch.bat`) (Requires [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10))
+Windows (`UpdatePatch.bat`) using [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
 
 ```bat
 cd .Patches
-git pull origin master
+REM git pull origin master
 cd ..
-xcopy /E /Y .Editor Editor
+del /S /Q /F Editor>nul
+xcopy /I /E /Y .Editor Editor>nul
 cd Editor
 bash -c "patch --binary -p1 < ../.Patches/patch.diff"
-exit
+cd ..
 ```
 
 Now if things are done correctly you can just double-click the script and it'll be automatically updated in instant.
@@ -50,6 +51,10 @@ Now if things are done correctly you can just double-click the script and it'll 
 ## Why the .diff file??
 
 The [original Nottorus](http://u3d.as/qVo) still alive in Asset Store, so I can't publish the source code it contained. However patches is mine, so I can give it away freely.
+
+## Technical Limitation (Windows only)
+
+Windows uses CRLF ending, however I found that `patch` is broken whenever I try to push CRLF during patching session, so at the end all Nottorus script is patched with Unix (LF) ending. If you want to modify Nottorus scripts, I advise you to renormalize it back to CRLF (otherwise, don't :smile: )
 
 ## Contributing
 
@@ -60,7 +65,7 @@ If you have problem with installation, please check existing issues first before
 If you want to contribute, here's how I create the patch:
 
 ```sh
-diff -x '*.meta' -urB --strip-trailing-cr .Editor Editor > .Patches/patch.diff
+diff -x '*.meta' -ur --strip-trailing-cr .Editor Editor > .Patches/patch.diff
 ```
 
 <!--
