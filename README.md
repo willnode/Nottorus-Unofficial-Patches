@@ -15,7 +15,7 @@ See changes [in a table here](https://blog.wellosoft.net/en/nottorus-after-2-yea
 
 0. Extract Nottorus v2.0 into your project
 1. Extract `SourceCode.rar` in `Assets\Nottorus\src\SourceCode.rar` to `Assets\Nottorus\` (There should be `Editor` folder after extraction)
-2. Rename `Editor` to `.Editor` (Unity ignores any files/folder with a dot in beginning)
+2. Rename `Editor` to `.Editor` (Unity ignores any files/folder with a dot in beginning) (For windows, open Bash/Git Bash and do `mv Editor .Editor` or `ren Editor .Editor` in CMD/Powershell)
 3. Normalize Ending: Save [this script (use normalize-lf)](https://gist.github.com/willnode/a6e76fcb9ac5d150df4a356b818a0ffe) to `.Editor` folder and run it, then delete the script.
 3. Delete `Nottorus_Plugin.dll` and `Addon_CSP.dll` from `Plugins`
 4. Open Bash/Git Bash in folder `Assets\Nottorus\` and run `git clone https://github.com/willnode/Nottorus-Unofficial-Patches .Patches` (There should be `.Patches` folder after cloning)
@@ -54,7 +54,9 @@ The [original Nottorus](http://u3d.as/qVo) still alive in Asset Store, so I can'
 
 ## Technical Limitation (Windows only)
 
-Windows uses CRLF ending, however I found that `patch` is broken whenever I try to push CRLF during patching session, so at the end all Nottorus script is patched with Unix (LF) ending. If you want to modify Nottorus scripts, I advise you to renormalize it back to CRLF (otherwise, don't :smile: )
+Windows uses CRLF ending, however I found that `patch` is broken whenever I try to push CRLF during patching session, so at the end all Nottorus script has to be patched with Unix (LF) ending. If you want to modify Nottorus scripts, I advise you to renormalize it back to CRLF (otherwise, don't )
+
+If patch does not work, mostly because of EOL conflict. Check that both source and patch are in Unix Ending, see [here](https://forum.unity.com/threads/released-nottorus-unlimited-visual-programming-plugin.395750/page-24#post-3549703).
 
 ## Contributing
 
