@@ -1,8 +1,16 @@
 # [Nottorus](http://u3d.as/qVo) Unofficial Patches
 
+### The Maker of Nottorus has contacted me personally and releasing [a hotfix today](https://forum.unity.com/threads/released-nottorus-unlimited-visual-programming-plugin.395750/page-25#post-3550651).
+
+### To avoid confusion, I'm locking this repo. Patches in this repo are now outdated. Additional features offered in this repo may be Integrated into future version of Nottorus. Cheers guys.
+
+<!--
+
 ### [Read my post for preamble about what is going on](https://blog.wellosoft.net/en/nottorus-after-2-years.html)
 
-Nottorus is a powerful plugin, first of its kind. Sadly the plugin author has walked away, and we're afraid of losing this masterpiece.
+Nottorus is a powerful plugin, first of its kind. ~~Sadly the plugin author has walked away, and we're afraid of losing this masterpiece.~~
+
+-->
 
 ## About This Repo
 
