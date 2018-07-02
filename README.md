@@ -10,7 +10,7 @@
 
 Nottorus is a powerful plugin, first of its kind. ~~Sadly the plugin author has walked away, and we're afraid of losing this masterpiece.~~
 
--->
+
 
 ## About This Repo
 
@@ -77,6 +77,8 @@ If you want to contribute, here's how I create the patch:
 ```sh
 diff -x '*.meta' -ur --strip-trailing-cr .Editor Editor > .Patches/patch.diff
 ```
+
+-->
 
 <!--
 
